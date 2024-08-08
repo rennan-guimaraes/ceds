@@ -1,0 +1,11 @@
+ProductID,ProductName,Category,Price,QuantitySold,SaleDate
+1,Product A,Electronics,12.401032825355255,1,2024-06-29
+2,Product B,Clothing,40.741669957672315,15,2023-12-26
+3,Product C,Electronics,19.878077837492736,13,2024-01-30
+4,Product D,Clothing,88.56384831043448,7,2024-04-28
+5,Product E,Groceries,40.9675266121437,18,2024-01-24
+6,Product F,Groceries,88.51324898610558,14,2024-06-05
+7,Product G,Electronics,37.45368964702877,17,2024-06-14
+8,Product H,Groceries,54.51536360265984,11,2023-12-09
+9,Product I,Clothing,99.0971793095864,6,2023-11-16
+10,Product J,Electronics,99.29136997028198,17,2024-07-25

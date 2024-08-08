@@ -1,0 +1,16 @@
+# R specific
+.Rhistory
+.RData
+.Rproj.user/
+
+# Renv specific
+.renv/
+renv/library/
+renv/staging/
+
+# Other
+*.tsv
+*.xlsx
+*.rds
+*.rda
+*.Rproj
