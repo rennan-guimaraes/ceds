@@ -1,0 +1,216 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+Esse é um Notebook que utiliza [R Markdown](http://rmarkdown.rstudio.com).
+Os resultados dos trechos códigos aparecem diretamente na tela. 
+
+Para executar trechos de código utilize o botão *Run* ou o atalho 
+*Ctrl+Shift+Enter*. 
+
+```{r}
+(1 + sqrt(5)) / 2
+```
+
+Utilize o botão *Insert Chunk* ou o atalho *Ctrl+Alt+I* para criar um novo
+trecho de código.
+
+Utilize o botão *Preview* ou o atalho *Ctrl+Shift+K* para visualizar uma versão
+renderizada do notebook.
+
+Primeiro, vamos carregar o conjunto de bibliotecas para manipulação de dados
+`tidyverse`.
+
+```{r}
+library(tidyverse)
+```
+
+*Atenção*: Não esqueça de instalar o pacote `tidyverse` previamente.
+
+*Dica:* Mantenha seus pacotes sempre atualizados.
+
+# Conceitos básicos
+
+Nas aulas de *Coleta, integração e armazenamento*, aprenderemos muito mais sobre
+manipulação de dados.  Por ora, aprenderemos o básico para nos familiarizarmos
+com os principais conceitos em R.
+
+Vamos começar abrindo o arquivo que contém os dados que trabalharemos.
+
+```{r}
+data <- read_table("german.data", col_names = FALSE)
+```
+*Dica:* Verifique se você está trabalhando no diretório correto.
+
+*Dica:* Em R, podemos ler diretamente da URL.
+
+```{r}
+#data <- 
+#  read_table("https://archive.ics.uci.edu/ml/machine-learning-databases/statlog/german/german.data", 
+#             col_names = FALSE)
+```
+
+
+```{r}
+spec(data)
+```
+
+
+```{r}
+dim(data)
+```
+
+```{r}
+class(data)
+```
+
+```{r}
+summary(data)
+```
+
+
+```{r}
+data
+```
+
+Dando nomes às colunas:
+
+```{r}
+colnames(data) <- c(
+  "Status_of_existing_checking_account",
+  "Duration_in_month",
+  "Credit_history",
+  "Purpose",
+  "Credit_amount",
+  "Saving_account_bonds",
+  "Present_employment_since",
+  "Installment_rate_of_disposable_income",
+  "Personal_status_and_sex",
+  "Other_debtors_guarantors",
+  "Present_residence_since",
+  "Property",
+  "Age_in_years",
+  "Other_installment_plans",
+  "Housing",
+  "Number_of_existing_credits_at_this_bank",
+  "Job",
+  "Number_of_people_being_liable_to_provide_maintenance_for",
+  "Telephone",
+  "Foreign_worker",
+  "Good_Loan"
+)
+data
+```
+
+```{r}
+good_loan <- data$Good_Loan
+good_loan
+```
+
+```{r}
+class(good_loan)
+```
+
+```{r}
+length(good_loan)
+```
+
+Corrigindo os valores dos atributos.
+
+```{r}
+data <-
+  data %>%
+  mutate(# Convertendo o status da conta corrente, estamos assumindo que "A14"
+         # significa que não temos informação sobre a conta corrente.
+         # No caso, "A14" será convertido para NA.
+         Status_of_existing_checking_account = 
+           case_when(Status_of_existing_checking_account == "A11" ~ "... < 0 DM",
+                     Status_of_existing_checking_account == "A12" ~ "0 <= ... < 200 DM",
+                     Status_of_existing_checking_account == "A13" ~ "... >= 200 DM"),
+         #Status_of_existing_checking_account = 
+         #  factor(Status_of_existing_checking_account,
+         #         levels = c("... < 0 DM", "0 <= ... < 200 DM", "... >= 200 DM")))
+
+         # ...
+         
+         # Convertemos "A201" para "yes", e "A202" para "no".
+         Foreign_worker = if_else(Foreign_worker == "A201", "yes", "no"))
+  
+data
+```
+
+---
+
+**Exercício para nota**
+
+Corrigir atributos restantes.
+
+Siga as instruções adicionais:
+
+- `Installment_rate_of_disposable_income` entre 0 e 1.
+- `Good_loan` para `"yes"` e `"no"`
+
+
+*Observação:* Pode existir mais de uma maneira correta de representar o mesmo
+dado.  Em geral, balanceamos as vantagens e desvantagens.
+
+*Dica:* Não reinvente a roda! Se o seu código está tornando muito complexo,
+muito provavelmente há uma função pronta que faz o que está tentando fazer.
+
+---
+
+Algumas colunas (variáveis) podem ter valores textuais, porém conceitualmente 
+ordenados (qualitativo ordinal, como veremos em Aprendizado de Máquina).
+
+Para isso, usamos `factor`.
+
+```{r}
+data <- 
+  data %>% 
+  mutate(Status_of_existing_checking_account = 
+           factor(Status_of_existing_checking_account,
+                  levels = c("... < 0 DM", "0 <= ... < 200 DM", "... >= 200 DM")))
+data$Status_of_existing_checking_account[1:10]
+```
+
+```{r}
+levels(data$Status_of_existing_checking_account)
+```
+
+
+```{r}
+ggplot(data) + geom_bar(aes(Status_of_existing_checking_account), stat = "count")
+```
+
+
+*Dica:* Não use `factors` para representar atributos quantitativos
+nominais, ou seja, aqueles atributos qualitativos que não possuem ordem
+pré-definida.
+
+Para salvar o arquivo em CSV:
+
+```{r}
+write_csv(data, "german.csv")
+```
+
+
+# Revisão
+
+- Em R, há muitas maneiras de fazer a mesma coisa. Neste curso, utilizaremos
+  as convenções e ferramentas da biblioteca `tidyverse` para facilitar.
+- Os principais valores que lidamos em R são *numéricos*, *fatores*, ou
+  *strings*. Eles são normalmente organizados em *vetores*, *listas* ou
+  *data frames*.
+- Ao longo do curso, revisitaremos várias pontos da sintaxe, da semântica e dos
+  tipos de dados de maneira aplicada. **Mantenha a calma**, aos poucos nos
+  familiarizaremos com todos os conceitos.
+
+
+Sugestão de leitura:
+
+- Capítulo 2 do livro "Practical Data Science with R", Nina Zumel e John Mount, 
+  Manning Publications, 2ª Edição, 2019.
+
+No entanto, note que utilizaremos convenções e notações mais próximas das
+adotadas por Wickham.
