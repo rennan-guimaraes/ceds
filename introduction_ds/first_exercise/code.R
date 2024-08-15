@@ -8,7 +8,7 @@ library(tidyverse)
 
 install.packages("styler")
 library(styler)
-data <- read.table("./data/German data.data", header = FALSE, sep = " ")
+data <- read.table("./german.data", header = FALSE, sep = " ")
 
 # visualize data
 data |>
@@ -267,4 +267,4 @@ german_bank_data |>
   glimpse()
 
 # save data
-write.csv(german_bank_data, "./data/german_bank_data.csv", row.names = FALSE)
+write.csv(german_bank_data, "./german.csv", row.names = FALSE)

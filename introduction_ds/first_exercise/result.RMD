@@ -1,0 +1,300 @@
+---
+title: "Primeira atividade: Base de dados German"
+author: Rennan Guimarães
+output: html_document
+---
+
+# Introdução
+
+Este documento faz a transformação do conjunto de dados German, solictada pelo professor Filipe Verri. O objetivo é carregar, renomear colunas e transformar dados.
+
+# Requisitos da atividade
+
+- [x] Carregue a base de dados em "german.data" (assuma que o arquivo está o diretório corrente);
+- [x] Substitua os códigos "A???" por valores categóricos significativos (conforme exemplo em aula);
+- [x] Converta os valores de `Installment_rate_of_disposable_income` entre 0 e 1; 
+- [x] Converta os valores de `Good_loan` para `"yes"` e `"no"`; 
+- [x] Justifique com comentários breves as decisões para cada variável, se aplicável;
+- [x] Salve o arquivo resultante em um CSV chamado "german.csv".
+
+# Instalação e Carregamento de Pacotes
+
+Instalamos e carregamos os pacotes necessários para a análise.
+
+```{r}
+# Instalar e carregar pacotes
+library(tidyverse)
+```
+
+# Carregamento dos Dados
+
+Carregamos a base de dados German a partir de um arquivo de texto.
+
+```{r}
+# Carregar dados
+data <- read.table("./german.data", header = FALSE, sep = " ")
+```
+
+# Visualização Inicial dos Dados
+
+Utilizamos a função `glimpse` para obter uma visão geral dos dados, conforme apresentado no capítulo 3 do livro "R for Data Science".
+
+```{r}
+# Visualizar dados
+data |> glimpse()
+```
+
+# Renomeando Colunas
+
+Renomeamos as colunas para facilitar a interpretação dos dados.
+
+```{r}
+# Renomear colunas
+german_bank_data <- data |> 
+  rename("account_status" = V1, duration_month = V2,
+         credit_history = V3, purpose = V4,
+         credit_amount = V5, saving_account = V6,
+         employment_since = V7, installment_rate = V8,
+         personal_status = V9, other_debtors = V10,
+         residence_since = V11, property = V12,
+         age = V13, other_installment = V14,
+         housing = V15, existing_credits = V16,
+         job = V17, people_liable = V18, telephone = V19,
+         foreign_worker = V20, good_loan = V21)
+```
+
+# Transformação dos Dados
+
+A seguir, transformamos várias colunas categóricas com códigos numéricos ou strings em valores descritivos, seguindo a forma que são apresentadas na documentação "german.doc".
+
+## Account Status
+
+```{r}
+# Transformar account_status
+german_bank_data <- german_bank_data |> 
+  mutate(account_status = case_when(
+    account_status == "A11" ~ "... < 0 DM",
+    account_status == "A12" ~ "0 <= ... < 200 DM",
+    account_status == "A13" ~ "... >= 200 DM / salary assignments for at least 1 year",
+    account_status == "A14" ~ "no checking account"
+  ))
+```
+
+## Credit History
+
+```{r}
+# Transformar credit_history
+german_bank_data <- german_bank_data |> 
+  mutate(credit_history = case_when(
+    credit_history == "A30" ~ "no credits taken/all credits paid back duly",
+    credit_history == "A31" ~ "all credits at this bank paid back duly",
+    credit_history == "A32" ~ "existing credits paid back duly till now",
+    credit_history == "A33" ~ "delay in paying off in the past",
+    credit_history == "A34" ~ "critical account/other credits existing (not at this bank)"
+  ))
+```
+
+## Purpose
+
+```{r}
+# Transformar purpose
+german_bank_data <- german_bank_data |> 
+  mutate(purpose = case_when(
+    purpose == "A40" ~ "car (new)",
+    purpose == "A41" ~ "car (used)",
+    purpose == "A42" ~ "furniture/equipment",
+    purpose == "A43" ~ "radio/television",
+    purpose == "A44" ~ "domestic appliances",
+    purpose == "A45" ~ "repairs",
+    purpose == "A46" ~ "education",
+    purpose == "A47" ~ "(vacation - does not exist?)",
+    purpose == "A48" ~ "retraining",
+    purpose == "A49" ~ "business",
+    purpose == "A410" ~ "others"
+  ))
+```
+
+## Saving Account
+
+```{r}
+# Transformar saving_account
+german_bank_data <- german_bank_data |> 
+  mutate(saving_account = case_when(
+    saving_account == "A61" ~ "... < 100 DM",
+    saving_account == "A62" ~ "100 <= ... < 500 DM",
+    saving_account == "A63" ~ "500 <= ... < 1000 DM",
+    saving_account == "A64" ~ "... >= 1000 DM",
+    saving_account == "A65" ~ "unknown/ no savings account"
+  ))
+```
+
+## Employment Since
+
+```{r}
+# Transformar employment_since
+german_bank_data <- german_bank_data |> 
+  mutate(employment_since = case_when(
+    employment_since == "A71" ~ "unemployed",
+    employment_since == "A72" ~ "... < 1 year",
+    employment_since == "A73" ~ "1 <= ... < 4 years",
+    employment_since == "A74" ~ "4 <= ... < 7 years",
+    employment_since == "A75" ~ "... >= 7 years"
+  ))
+```
+
+## Installment Rate
+
+Primeiro, precisamos entender quais são os número em installment_rate, para isso, utilizamos "select" para selecionar a coluna, "distinct" para obter valores únicos e "arrange" para organizar a resposta.
+
+```{r}
+german_bank_data |>
+  select(installment_rate) |>
+  distinct() |>
+  arrange(installment_rate, .desc = FALSE)
+```
+
+Depois, seguimos categorizando de 0 a 1, escolhendo 0 para representar a menor possibilidade e 1 para a maior.
+
+```{r}
+# Transformar installment_rate
+german_bank_data <- german_bank_data |> 
+  mutate(installment_rate = case_when(
+    installment_rate == 1 ~ 0,
+    installment_rate == 2 ~ 0.33,
+    installment_rate == 3 ~ 0.66,
+    installment_rate == 4 ~ 1
+  ))
+```
+
+## Personal Status and Sex
+
+```{r}
+# Transformar personal_status
+german_bank_data <- german_bank_data |> 
+  mutate(personal_status = case_when(
+    personal_status == "A91" ~ "male : divorced/separated",
+    personal_status == "A92" ~ "female : divorced/separated/married",
+    personal_status == "A93" ~ "male : single",
+    personal_status == "A94" ~ "male : married/widowed",
+    personal_status == "A95" ~ "female : single"
+  ))
+```
+
+## Other Debtors/Gyarantos
+
+```{r}
+# Transformar other_debtors
+german_bank_data <- german_bank_data |> 
+  mutate(other_debtors = case_when(
+    other_debtors == "A101" ~ "none",
+    other_debtors == "A102" ~ "co-applicant",
+    other_debtors == "A103" ~ "guarantor"
+  ))
+```
+
+## Property
+
+```{r}
+# Transformar property
+german_bank_data <- german_bank_data |> 
+  mutate(property = case_when(
+    property == "A121" ~ "real estate",
+    property == "A122" ~ "building society savings agreement/life insurance",
+    property == "A123" ~ "car or other",
+    property == "A124" ~ "unknown / no property"
+  ))
+```
+
+## Other Installment Plans
+
+```{r}
+# Transformar other_installment
+german_bank_data <- german_bank_data |> 
+  mutate(other_installment = case_when(
+    other_installment == "A141" ~ "bank",
+    other_installment == "A142" ~ "stores",
+    other_installment == "A143" ~ "none"
+  ))
+```
+
+## Housing
+
+```{r}
+# Transformar housing
+german_bank_data <- german_bank_data |> 
+  mutate(housing = case_when(
+    housing == "A151" ~ "rent",
+    housing == "A152" ~ "own",
+    housing == "A153" ~ "for free"
+  ))
+```
+
+## Job
+
+```{r}
+# Transformar job
+german_bank_data <- german_bank_data |> 
+  mutate(job = case_when(
+    job == "A171" ~ "unemployed/ unskilled - non-resident",
+    job == "A172" ~ "unskilled - resident",
+    job == "A173" ~ "skilled employee/ official",
+    job == "A174" ~ "management/ self-employed/ highly qualified employee/ officer"
+  ))
+```
+
+## Telephone
+
+```{r}
+# Transformar telephone
+german_bank_data <- german_bank_data |> 
+  mutate(telephone = case_when(
+    telephone == "A191" ~ "none",
+    telephone == "A192" ~ "yes"
+  ))
+```
+
+## Foreign Worker
+
+```{r}
+# Transformar foreign_worker
+german_bank_data <- german_bank_data |> 
+  mutate(foreign_worker = case_when(
+    foreign_worker == "A201" ~ "yes",
+    foreign_worker == "A202" ~ "no"
+  ))
+```
+
+## Good Loan
+
+```{r}
+# Transformar good_loan
+german_bank_data <- german_bank_data |> 
+  mutate(good_loan = case_when(
+    good_loan == 1 ~ "yes",
+    good_loan == 2 ~ "no"
+  ))
+```
+
+# Visualização Final dos Dados
+
+Depois de realizar todas as transformações, visualizamos os dados finais.
+
+```{r}
+# Visualizar dados transformados
+german_bank_data |>
+ glimpse()
+```
+
+# Salvando os Dados Transformados
+
+Por fim, salvamos os dados transformados em um arquivo CSV.
+
+```{r}
+# Salvar dados transformados
+write.csv(german_bank_data, "./german.csv", row.names = FALSE)
+```
+
+# Observações
+
+Professor, coloquei esse projeto também no github, o link para acesso é:
+https://github.com/rennan-guimaraes/ceds/tree/main/introduction_ds/first_exercise
