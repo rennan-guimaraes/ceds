@@ -1,37 +1,65 @@
----
-title: "Segunda atividade: Base de dados German"
-author: Rennan Guimarães
-output: html_document
----
-
-# Introdução
-
-Este documento faz a exploração do conjunto de dados German, solictada pelo professor Filipe Verri.
-
-# Requisitos da atividade
-
-- [x] No cabeçalho do R Notebook, inclua seu nome completo no campo author;
-- [ ] Não inclua gráficos ou estatísticas que não tragam informações relevantes;
-- [ ] Atente-se aos nomes dos eixos, rótulos, variáveis, etc. Lembre-se de organizar o melhor possível seu código;
-- [ ] Não é necessário comentar o código, mas sim documentar todas suas decisões e insights no relatório;
-- [ ] O objetivo principal é compreender a base de dados e identificar seus problemas;
-- [ ] Leia o arquivo german.doc https://archive.ics.uci.edu/ml/machine-learning-databases/statlog/german/german.doc para sanar dúvidas quanto ao entendimento dos dados;
-- [ ] Caso a documentação do conjunto de dados seja insuficiente, coloque no relatório uma seção das perguntas que devem ser encaminhadas ao cliente.
-
-# Instalação e Carregamento de Pacotes
-
-Instalamos e carregamos os pacotes necessários para a análise.
-
-```{r}
-# Instalar e carregar pacotes
-library(tidyverse)
+```{R}
+library("tidyverse")
 ```
 
-# Carregamento dos Dados
+```{R}
+data_german <- readRDS('./german.rds')
+```
 
-Carregamos a base de dados German a partir de um arquivo de texto.
+```{R}
+summary(data_german)
+```
+variaveis com valores ausentes
 
-```{r}
-# Carregar dados
-data <- read.table("./german.rds")
+```{R}
+data_german |>
+  summarize_all(~mean(is.na(.))) |>
+  pivot_longer(everything(), names_to = "variable", values_to = "na_frac") |>
+  filter(na_frac > 0) |>
+  arrange(desc(na_frac))
+```
+
+```{R}
+data_german |> 
+  summarize(across(everything(), ~sum(is.na(.)))) |>
+  pivot_longer(everything(), names_to = "columns", values_to = "na_count") |>
+  filter(na_count > 0) |>
+  arrange(desc(na_count))
+```
+
+Conclusão: Dos valores vazios, o maior número está em status_of_existing_checking_account
+
+Pergunta: Qual é a relação entre as variaveis nulas?
+```{R}
+library(corrr)
+```
+
+```{R}
+na_correlation <- data_german |>
+  mutate(across(everything(), is.na)) |>
+  correlate() |>
+  stretch() |>
+  filter(abs(r) > 0, abs(r) < 1)
+
+na_correlation |>
+  arrange(desc(abs(r))) |>
+  head(10) |>
+  knitr::kable()
+```
+
+Há poucos valores vazios de saving_account_bonds
+
+Agora, todos os saving_accoun)bonds não tem status of existing_checking_account?
+Também não.
+
+Colocar no relatório do professor: "Nos valores nulos
+
+
+
+```{R}
+data_german |>
+  summarize_all(~mean(is.na(.))) |>
+  pivot_longer(everything(), names_to = "variable", values_to = "na_frac") |>
+  filter(na_frac > 0) |>
+  arrange(desc(na_frac))
 ```
