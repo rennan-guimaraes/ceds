@@ -1,0 +1,370 @@
+---
+title: "Análise Exploratória de Dados de Crédito Alemão"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Carregando e Preparando os Dados
+
+```{r load-data}
+# Carregar bibliotecas necessárias
+library(tidyverse)
+library(ggplot2)
+library(corrplot)
+
+# Carregar os dados
+german_credit <- readRDS('./german.rds')
+
+# Visualizar as primeiras linhas e estrutura dos dados
+head(german_credit)
+str(german_credit)
+```
+
+## Análise Univariada
+
+### Status_of_existing_checking_account
+
+```{r status-checking}
+table(german_credit$Status_of_existing_checking_account)
+ggplot(german_credit, aes(x = Status_of_existing_checking_account)) +
+  geom_bar() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Perguntas a serem respondidas:
+# 1. Qual é a distribuição dos status das contas correntes?
+# 2. Há alguma categoria predominante?
+# 3. Existem valores NA ou inconsistentes?
+```
+
+### Duration_in_month
+
+```{r duration}
+summary(german_credit$Duration_in_month)
+ggplot(german_credit, aes(x = Duration_in_month)) +
+  geom_histogram(binwidth = 6)
+
+# Perguntas a serem respondidas:
+# 1. Qual é a duração média e mediana dos empréstimos?
+# 2. Existem outliers na duração dos empréstimos?
+# 3. A distribuição é simétrica ou assimétrica?
+```
+
+### Credit_history
+
+```{r credit-history}
+table(german_credit$Credit_history)
+ggplot(german_credit, aes(x = Credit_history)) +
+  geom_bar() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Perguntas a serem respondidas:
+# 1. Quais são as categorias mais comuns de histórico de crédito?
+# 2. Há alguma categoria sub-representada?
+# 3. Como o histórico de crédito se relaciona com a aprovação do empréstimo?
+```
+
+### Purpose
+
+```{r purpose}
+table(german_credit$Purpose)
+ggplot(german_credit, aes(x = Purpose)) +
+  geom_bar() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Perguntas a serem respondidas:
+# 1. Quais são os propósitos mais comuns para os empréstimos?
+# 2. Há algum propósito incomum ou inesperado?
+# 3. Como o propósito do empréstimo se relaciona com outras variáveis, como duração ou valor do crédito?
+```
+
+### Credit_amount
+
+```{r credit-amount}
+summary(german_credit$Credit_amount)
+ggplot(german_credit, aes(x = Credit_amount)) +
+  geom_histogram(binwidth = 1000)
+
+# Perguntas a serem respondidas:
+# 1. Qual é a distribuição dos valores de crédito?
+# 2. Existem outliers nos valores de crédito?
+# 3. Como o valor do crédito se relaciona com outras variáveis, como duração ou propósito?
+```
+
+### Saving_account_bonds
+
+```{r savings}
+table(german_credit$Saving_account_bonds)
+ggplot(german_credit, aes(x = Saving_account_bonds)) +
+  geom_bar() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Perguntas a serem respondidas:
+# 1. Qual é a distribuição das categorias de poupança/títulos?
+# 2. Há muitos valores NA nesta variável?
+# 3. Como as economias se relacionam com a aprovação do empréstimo?
+```
+
+### Present_employment_since
+
+```{r employment}
+table(german_credit$Present_employment_since)
+ggplot(german_credit, aes(x = Present_employment_since)) +
+  geom_bar() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Perguntas a serem respondidas:
+# 1. Qual é a distribuição do tempo de emprego atual?
+# 2. Há alguma categoria predominante?
+# 3. Como o tempo de emprego se relaciona com outras variáveis, como valor do crédito ou aprovação do empréstimo?
+```
+
+### Installment_rate_of_disposable_income
+
+```{r installment-rate}
+summary(german_credit$Installment_rate_of_disposable_income)
+ggplot(german_credit, aes(x = Installment_rate_of_disposable_income)) +
+  geom_histogram(binwidth = 0.01)
+
+# Perguntas a serem respondidas:
+# 1. Qual é a taxa média de prestação em relação à renda disponível?
+# 2. Existem valores atípicos ou extremos?
+# 3. Como essa taxa se relaciona com a aprovação do empréstimo?
+```
+
+### Personal_status_and_sex
+
+```{r personal-status}
+table(german_credit$Personal_status_and_sex)
+ggplot(german_credit, aes(x = Personal_status_and_sex)) +
+  geom_bar() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Perguntas a serem respondidas:
+# 1. Qual é a distribuição de status pessoal e sexo?
+# 2. Há algum desequilíbrio significativo entre as categorias?
+# 3. Como essas categorias se relacionam com a aprovação do empréstimo?
+```
+
+### Other_debtors_guarantors
+
+```{r other-debtors}
+table(german_credit$Other_debtors_guarantors)
+ggplot(german_credit, aes(x = Other_debtors_guarantors)) +
+  geom_bar() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Perguntas a serem respondidas:
+# 1. Qual é a distribuição de outros devedores/garantidores?
+# 2. Qual é a categoria mais comum?
+# 3. Como a presença de outros devedores/garantidores afeta a aprovação do empréstimo?
+```
+
+### Present_residence_since
+
+```{r residence}
+table(german_credit$Present_residence_since)
+ggplot(german_credit, aes(x = Present_residence_since)) +
+  geom_bar()
+
+# Perguntas a serem respondidas:
+# 1. Qual é a distribuição do tempo de residência atual?
+# 2. Há alguma categoria predominante?
+# 3. Como o tempo de residência se relaciona com outras variáveis, como aprovação do empréstimo ou valor do crédito?
+```
+
+### Property
+
+```{r property}
+table(german_credit$Property)
+ggplot(german_credit, aes(x = Property)) +
+  geom_bar() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Perguntas a serem respondidas:
+# 1. Quais são os tipos de propriedade mais comuns?
+# 2. Há muitos valores NA nesta variável?
+# 3. Como o tipo de propriedade se relaciona com a aprovação do empréstimo?
+```
+
+### Age_in_years
+
+```{r age}
+summary(german_credit$Age_in_years)
+ggplot(german_credit, aes(x = Age_in_years)) +
+  geom_histogram(binwidth = 5)
+
+# Perguntas a serem respondidas:
+# 1. Qual é a distribuição de idade dos solicitantes?
+# 2. Há algum padrão ou tendência relacionada à idade?
+# 3. Como a idade se relaciona com outras variáveis, como valor do crédito ou aprovação do empréstimo?
+```
+
+### Other_installment_plans
+
+```{r other-plans}
+table(german_credit$Other_installment_plans)
+ggplot(german_credit, aes(x = Other_installment_plans)) +
+  geom_bar()
+
+# Perguntas a serem respondidas:
+# 1. Qual é a distribuição de outros planos de prestações?
+# 2. Qual é a categoria mais comum?
+# 3. Como a presença de outros planos de prestações afeta a aprovação do empréstimo?
+```
+
+### Housing
+
+```{r housing}
+table(german_credit$Housing)
+ggplot(german_credit, aes(x = Housing)) +
+  geom_bar()
+
+# Perguntas a serem respondidas:
+# 1. Qual é a distribuição dos tipos de moradia?
+# 2. Há alguma categoria predominante?
+# 3. Como o tipo de moradia se relaciona com a aprovação do empréstimo?
+```
+
+### Number_of_existing_credits_at_this_bank
+
+```{r existing-credits}
+table(german_credit$Number_of_existing_credits_at_this_bank)
+ggplot(german_credit, aes(x = Number_of_existing_credits_at_this_bank)) +
+  geom_bar()
+
+# Perguntas a serem respondidas:
+# 1. Qual é a distribuição do número de créditos existentes?
+# 2. Qual é o número mais comum de créditos existentes?
+# 3. Como o número de créditos existentes afeta a aprovação do novo empréstimo?
+```
+
+### Job
+
+```{r job}
+table(german_credit$Job)
+ggplot(german_credit, aes(x = Job)) +
+  geom_bar() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Perguntas a serem respondidas:
+# 1. Quais são as categorias de emprego mais comuns?
+# 2. Há alguma categoria sub-representada?
+# 3. Como o tipo de emprego se relaciona com a aprovação do empréstimo?
+```
+
+### Number_of_people_being_liable_to_provide_maintenance_for
+
+```{r dependents}
+table(german_credit$Number_of_people_being_liable_to_provide_maintenance_for)
+ggplot(german_credit, aes(x = Number_of_people_being_liable_to_provide_maintenance_for)) +
+  geom_bar()
+
+# Perguntas a serem respondidas:
+# 1. Qual é a distribuição do número de dependentes?
+# 2. Qual é o número mais comum de dependentes?
+# 3. Como o número de dependentes afeta a aprovação do empréstimo?
+```
+
+### Telephone
+
+```{r telephone}
+table(german_credit$Telephone)
+ggplot(german_credit, aes(x = Telephone)) +
+  geom_bar()
+
+# Perguntas a serem respondidas:
+# 1. Qual é a proporção de pessoas com e sem telefone?
+# 2. Como a posse de telefone se relaciona com outras variáveis socioeconômicas?
+# 3. A posse de telefone tem algum impacto na aprovação do empréstimo?
+```
+
+### Foreign_worker
+
+```{r foreign-worker}
+table(german_credit$Foreign_worker)
+ggplot(german_credit, aes(x = Foreign_worker)) +
+  geom_bar()
+
+# Perguntas a serem respondidas:
+# 1. Qual é a proporção de trabalhadores estrangeiros na amostra?
+# 2. Como o status de trabalhador estrangeiro se relaciona com outras variáveis?
+# 3. O status de trabalhador estrangeiro afeta a aprovação do empréstimo?
+```
+
+### Good_loan
+
+```{r good-loan}
+table(german_credit$Good_loan)
+ggplot(german_credit, aes(x = Good_loan)) +
+  geom_bar()
+
+# Perguntas a serem respondidas:
+# 1. Qual é a proporção de empréstimos bons vs. ruins?
+# 2. Há um desequilíbrio significativo entre as classes?
+# 3. Como esta variável se relaciona com as outras variáveis do conjunto de dados?
+```
+
+## Análise Multivariada
+
+### Correlação entre variáveis numéricas
+
+```{r correlation}
+numeric_vars <- german_credit %>% 
+  select(where(is.numeric))
+cor_matrix <- cor(numeric_vars, use = "complete.obs")
+corrplot(cor_matrix, method = "circle")
+
+# Interpretar as correlações mais fortes e suas implicações
+```
+
+### Relação entre variáveis categóricas e aprovação do empréstimo
+
+```{r categorical-vs-approval}
+cat_vars <- names(german_credit)[sapply(german_credit, is.factor)]
+cat_vars <- cat_vars[cat_vars != "Good_loan"]
+
+for(var in cat_vars) {
+  print(ggplot(german_credit, aes_string(x = var, fill = "Good_loan")) +
+    geom_bar(position = "fill") +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+    ggtitle(paste("Relação entre", var, "e Aprovação do Empréstimo")))
+}
+
+# Interpretar as relações mais significativas observadas
+```
+
+### Análise de variáveis numéricas por aprovação do empréstimo
+
+```{r numeric-vs-approval}
+num_vars <- names(german_credit)[sapply(german_credit, is.numeric)]
+
+for(var in num_vars) {
+  print(ggplot(german_credit, aes_string(x = "Good_loan", y = var)) +
+    geom_boxplot() +
+    ggtitle(paste("Distribuição de", var, "por Aprovação do Empréstimo")))
+}
+
+# Interpretar as diferenças mais significativas observadas
+```
+
+## Conclusões e Próximos Passos
+
+Baseado nas análises acima, podemos tirar as seguintes conclusões preliminares:
+
+1. [Inserir conclusão principal 1]
+2. [Inserir conclusão principal 2]
+3. [Inserir conclusão principal 3]
+
+Próximos passos para a análise:
+
+1. Realizar testes estatísticos para confirmar as relações observadas
+2. Desenvolver modelos preditivos para prever a aprovação de empréstimos
+3. Investigar mais profundamente as variáveis que mostraram relações fortes com a aprovação do empréstimo
+4. Considerar a engenharia de features para melhorar o poder preditivo do conjunto de dados
+
+```
+
+Este código R Markdown fornece uma estrutura abrangente para a análise exploratória dos dados de crédito alemão. Ele inclui análises univariadas para

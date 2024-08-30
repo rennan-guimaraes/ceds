@@ -9,6 +9,26 @@ data_german <- readRDS('./german.rds')
 ```{R}
 summary(data_german)
 ```
+
+```{R}
+data_german |>
+  select(is.numeric) |>
+  colnames()
+```
+
+```{R}
+data_german |>
+  select(c(Sex, Personal_status) ) |>
+  filter(Sex=="male") |>
+  unique()
+
+data_german |>
+  select(c(Sex, Personal_status) ) |>
+  filter(Sex=="female") |>
+  unique()
+
+```
+
 variaveis com valores ausentes
 
 ```{R}
