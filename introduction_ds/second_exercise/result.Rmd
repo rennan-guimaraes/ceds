@@ -1,38 +1,338 @@
 ---
-title: "Segunda atividade: Base de dados German"
-author: Rennan Guimarães
-output: html_document
+title: "Segunda Atividade - Análise exploratória"
+author: "Rennan Guimarães"
+date: "01/09/2024"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    theme: darkly
+  pdf_document:
+    toc: true
 ---
 
-# Introdução
-
-Este documento faz a exploração do conjunto de dados German, solictada pelo professor Filipe Verri.
-
-# Requisitos da atividade
-
-- [x] No cabeçalho do R Notebook, inclua seu nome completo no campo author;
-- [ ] Não inclua gráficos ou estatísticas que não tragam informações relevantes;
-- [ ] Atente-se aos nomes dos eixos, rótulos, variáveis, etc. Lembre-se de organizar o melhor possível seu código;
-- [ ] Não é necessário comentar o código, mas sim documentar todas suas decisões e insights no relatório;
-- [ ] O objetivo principal é compreender a base de dados e identificar seus problemas;
-- [ ] Leia o arquivo german.doc https://archive.ics.uci.edu/ml/machine-learning-databases/statlog/german/german.doc para sanar dúvidas quanto ao entendimento dos dados;
-- [ ] Caso a documentação do conjunto de dados seja insuficiente, coloque no relatório uma seção das perguntas que devem ser encaminhadas ao cliente.
-
-# Instalação e Carregamento de Pacotes
-
-Instalamos e carregamos os pacotes necessários para a análise.
-
-```{r}
-# Instalar e carregar pacotes
-library(tidyverse)
-library(corrr)
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
 ```
+
+## Visualização
+Prezados,
+
+Este arquivo foi formatado para facilitar a leitura. Recomendo que gerem a versão em HTML utilizando o Knit.
+
+Se houver qualquer dificuldade em gerar o HTML, mas ainda assim desejarem visualizá-lo, o arquivo pode ser acessado e baixado diretamente do [repositório do projeto](https://github.com/rennan-guimaraes/ceds/tree/main/introduction_ds/second_exercise).
+
+## 1. Carregamento e Preparação dos Dados
+
+```{r libraries}
+library(tidyverse)
+library(skimr)
+library(corrplot)
+library(ggplot2)
+library(scales)
+library(knitr)
+library(forcats)
+```
+
+```{r load_data}
+data <- readRDS('./german.rds')
+```
+
+## 2. Visão Geral dos Dados
+
+```{r data_structure}
+skim(data)
+summary(data)
+```
+
+## 3. Análise de Valores Ausentes
+
+```{r missing_values}
+missing_values <- colSums(is.na(data))
+missing_values[missing_values > 0]
+```
+
+Há valores ausentes significativos em três variáveis importantes:
+
+1. Status_of_existing_checking_account: 394 valores ausentes (39.4% dos dados)
+2. Saving_account_bonds: 183 valores ausentes (18.3% dos dados)
+3. Property: 154 valores ausentes (15.4% dos dados)
+
+Será explorado em mais detalhes no final da análise.
+
+### 3.1 Valores none
+```{r none_values}
+data %>%
+  summarise(
+    Other_debtors_guarantors = sum(Other_debtors_guarantors == "none", na.rm = TRUE),
+    Other_installment_plans = sum(Other_installment_plans == "none", na.rm = TRUE)
+  ) %>%
+  pivot_longer(
+    cols = everything(),
+    names_to = "Variáveis",
+    values_to = "Contagem_none"
+  )
+```
+
+Considerando que essas variáveis possuem alto percentual de valores none, levantaremos algumas possíveis soluções e dúvidas referente a isso no final da análise.
+
+## 4. Distribuição da Variável Alvo
+
+```{r target_distribution}
+ggplot(data, aes(x = factor(Good_loan), fill = factor(Good_loan))) +
+  geom_bar() +
+  geom_text(stat = 'count', aes(label = ..count..), vjust = -0.5) +
+  scale_fill_manual(values = c("yes" = "#00BFC4", "no" = "#F8766D")) +
+  labs(title = "Distribuição de Bons e Maus Empréstimos",
+       x = "Qualidade do Empréstimo",
+       y = "Contagem") +
+  theme_minimal() +
+  guides(fill = FALSE)
+```
+
+A variável alvo 'Good_loan' mostra uma distribuição desequilibrada, com 700 bons empréstimos e 300 maus empréstimos. Esta informação é crucial, pois indica uma classificação desequilibrada.
+
+## 5. Análise de Variáveis Categóricas Importantes
+
+### 5.1 Status da Conta Corrente Existente
+
+```{r checking_account}
+data |>
+  filter(!is.na(Status_of_existing_checking_account)) |>
+  ggplot(aes(x = fct_infreq(Status_of_existing_checking_account), fill = factor(Good_loan))) +
+    geom_bar(position = "fill") +
+    labs(title = "Status da Conta Corrente vs. Qualidade do Empréstimo",
+         x = "Status da Conta Corrente",
+         y = "Proporção",
+         fill = "Bom Empréstimo") +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+O status da conta corrente parece ser um forte indicador da qualidade do empréstimo. Notavelmente, clientes com saldo negativo (<0 DM) têm uma proporção maior de maus empréstimos, enquanto aqueles com saldos mais altos (>= 200 DM) têm uma maior proporção de bons empréstimos. Esta informação pode ser valiosa para a avaliação de risco de crédito.
+
+### 5.2 Histórico de Crédito
+
+```{r credit_history}
+ggplot(data, aes(x = Credit_history, fill = factor(Good_loan))) +
+  geom_bar(position = "fill") +
+  labs(title = "Histórico de Crédito vs. Qualidade do Empréstimo",
+       x = "Histórico de Crédito",
+       y = "Proporção",
+       fill = "Bom Empréstimo") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+O histórico anterior de crédito parece indicar baixa relação com bons empréstimos. De fato, os dados mostram algumas tendências contraintuitivas:
+
+1. Clientes com contas classificadas como "critical" têm a maior proporção de bons empréstimos.
+2. Aqueles sem histórico de crédito ("no credits taken") apresentam a menor taxa de bons empréstimos.
+3. Clientes com todos os créditos pagos devidamente neste banco têm uma proporção relativamente baixa de bons empréstimos, menor que várias outras categorias.
+4. Categorias como "atraso em pagamentos no passado" e "créditos existentes pagos devidamente até agora" mostram taxas similares e relativamente altas de bons empréstimos.
+
+A relação entre histórico de crédito e qualidade do empréstimo é mais complexa do que se poderia supor inicialmente. Outros fatores provavelmente têm influência significativa na determinação da qualidade do empréstimo.
+
+### 5.3. Propósito do Empréstimo
+
+```{r loan_purpose}
+ggplot(data, aes(x = Purpose, fill = factor(Good_loan))) +
+  geom_bar(position = "fill") +
+  labs(title = "Propósito do Empréstimo vs. Qualidade",
+       x = "Propósito",
+       y = "Proporção",
+       fill = "Bom Empréstimo") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+O propósito do empréstimo mostra variações interessantes na qualidade do empréstimo:
+
+1. Empréstimos para educação, carros (novos), reparos, negócios e outros têm uma proporção maior de maus empréstimos.
+2. Empréstimos para carros (usados) e retreinamento têm uma proporção maior de bons empréstimos.
+
+### 5.4. Emprego e Qualidade do Empréstimo
+
+```{r employment_loan_quality}
+ggplot(data, aes(x = Present_employment_since, fill = factor(Good_loan))) +
+  geom_bar(position = "fill") +
+  labs(title = "Tempo de Emprego vs. Qualidade do Empréstimo",
+       x = "Tempo no Emprego Atual",
+       y = "Proporção",
+       fill = "Bom Empréstimo") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+O tempo de emprego mostra uma relação clara com a qualidade do empréstimo:
+
+1. Pessoas desempregadas ou com menos de 1 ano no emprego atual têm uma proporção maior de maus empréstimos.
+2. A proporção de bons empréstimos aumenta com o tempo de emprego, entretando, decaem um pouco para pessoas com 7 anos ou mais em relação ao melhor range de 4 <= ... <7.
+
+Para a avaliação de risco de crédito e pode ser um forte preditor da qualidade do empréstimo.
+
+### 5.5 Sexo do Solicitante
+
+```{r sex_analysis}
+ggplot(data, aes(x = Sex, fill = factor(Good_loan))) +
+  geom_bar(position = "fill") +
+  labs(title = "Sexo vs. Qualidade do Empréstimo",
+       x = "Sexo",
+       y = "Proporção",
+       fill = "Bom Empréstimo") +
+  theme_minimal()
+```
+
+A análise do sexo do solicitante mostra:
+
+1. Uma proporção ligeiramente maior de bons empréstimos para homens.
+2. Uma proporção ligeiramente maior de maus empréstimos para mulheres.
+
+Embora a diferença não seja muito grande, pode ser um fator a considerar em conjunto com outras variáveis na avaliação de risco.
+
+### 5.6 Tipo de Moradia
+
+```{r housing_analysis}
+ggplot(data, aes(x = Housing, fill = factor(Good_loan))) +
+  geom_bar(position = "fill") +
+  labs(title = "Tipo de Moradia vs. Qualidade do Empréstimo",
+       x = "Tipo de Moradia",
+       y = "Proporção",
+       fill = "Bom Empréstimo") +
+  theme_minimal()
+```
+
+A análise do tipo de moradia revela:
+
+1. Solicitantes com moradia própria têm uma proporção maior de bons empréstimos.
+2. Solicitantes que moram de aluguel ou de graça têm uma proporção maior de maus empréstimos.
+
+Isso sugere que o tipo de moradia pode ser um indicador importante da estabilidade financeira e, consequentemente, da qualidade do empréstimo.
+
+## 6. Análise de Variáveis Numéricas Chave
+
+### 6.1 Distribuição do Valor do Crédito
+
+```{r credit_amount}
+ggplot(data, aes(x = Credit_amount)) +
+  geom_histogram(binwidth = 1000, fill = "darkgreen", color = "black") +
+  labs(title = "Distribuição do Valor do Crédito",
+       x = "Valor do Crédito",
+       y = "Frequência") +
+  theme_minimal() +
+  scale_x_continuous(labels = scales::comma)
+```
+
+A distribuição do valor do crédito é assimétrica à direita, com a maioria dos empréstimos concentrados em valores mais baixos. Há alguns empréstimos de valor muito alto, que podem ser considerados outliers. Esta informação é importante para entender o perfil de risco dos empréstimos e pode requerer tratamento especial em modelos preditivos.
+
+### 6.2 Valor do Crédito vs. Qualidade do Empréstimo
+
+```{r credit_amount_vs_quality}
+ggplot(data, aes(x = factor(Good_loan), y = Credit_amount)) +
+  geom_boxplot(fill = "lightblue") +
+  labs(title = "Valor do Crédito vs. Qualidade do Empréstimo",
+       x = "Bom Empréstimo",
+       y = "Valor do Crédito") +
+  theme_minimal() +
+  scale_y_continuous(labels = scales::comma)
+```
+
+Interessantemente, os maus empréstimos têm uma mediana de valor de crédito ligeiramente maior que os bons empréstimos. Isso sugere que empréstimos de maior valor podem ter um risco ligeiramente maior de inadimplência. Também se observa uma maior dispersão nos valores dos maus empréstimos, com mais outliers de alto valor.
+
+### 6.3 Idade vs. Qualidade do Empréstimo
+
+```{r age_analysis}
+ggplot(data, aes(x = Age_in_years, fill = factor(Good_loan))) +
+  geom_histogram(binwidth = 5, position = "fill") +
+  labs(title = "Idade vs. Qualidade do Empréstimo",
+       x = "Idade",
+       y = "Proporção",
+       fill = "Bom Empréstimo") +
+  theme_minimal()
+```
+
+A análise da idade revela algumas tendências interessantes:
+
+1. Solicitantes mais jovens (abaixo de 30 anos) têm uma proporção ligeiramente maior de bons empréstimos.
+2. A proporção de maus empréstimos parece aumentar ligeiramente para solicitantes mais velhos.
+
+Isso pode indicar que a idade é um fator relevante na avaliação de risco, mas deve ser considerada em conjunto com outras variáveis.
+
+## 7. Análise de Correlação
+
+```{r correlation}
+numeric_vars <- data %>% 
+  select_if(is.numeric)
+cor_matrix <- cor(numeric_vars, use = "complete.obs")
+corrplot::corrplot(cor_matrix, method="color", addCoef.col = "black", tl.cex=0.5, number.cex=0.7)
+```
+
+A análise de correlação revela algumas relações interessantes:
+
+1. Há uma forte correlação positiva (0.62) entre 'Duration_in_month' e 'Credit_amount', o que é lógico, pois empréstimos maiores tendem a ter prazos mais longos.
+2. 'Present_residence_since' tem uma correlação positiva fraca (0.27) com 'Age_in_years', sugerindo que pessoas mais velhas tendem a morar há mais tempo em suas residências atuais.
+3. 'Number_of_existing_credits_at_this_bank' tem uma correlação positiva fraca (0.15) com 'Age_in_years', indicando que clientes mais velhos podem ter ligeiramente mais créditos no banco.
+4. Há uma correlação negativa fraca (-0.27) entre 'Credit_amount' e 'Installment_rate_of_disposable_income', sugerindo que empréstimos maiores podem ter taxas de prestação ligeiramente menores em relação à renda disponível.
+5. A maioria das outras variáveis mostra correlações fracas entre si, com valores próximos de zero.
+
+## 8. Resumo das principais características de bons créditos
 
 ```{R}
-data_german <- readRDS('./german.rds')
+good_loans <- data |>
+  filter(Good_loan == "yes")
+
+get_mode <- function(x) {
+  uniqx <- unique(na.omit(x))
+  uniqx[which.max(tabulate(match(x, uniqx)))]
+}
+
+summarize_variable <- function(x) {
+  if(is.numeric(x)) {
+    if(length(unique(x)) > 10) {
+      median_val <- median(x, na.rm = TRUE)
+      iqr_val <- IQR(x, na.rm = TRUE)
+      return(paste0("Mediana: ", round(median_val, 2), ", IQR: ", round(iqr_val, 2)))
+    } else {
+      return(paste0("Mediana: ", median(x, na.rm = TRUE), ", Moda: ", get_mode(x)))
+    }
+  } else {
+    return(get_mode(x))
+  }
+}
+
+summary_stats <- good_loans |>
+  summarise(across(everything(), summarize_variable)) |>
+  select(-Good_loan)
+
+result_table <- t(summary_stats)
+colnames(result_table) <- "Resumo"
+
+kable(result_table)
 ```
 
+Breve resumo das características de bons créditos, importante para identificar inconsistências com o cliente e mostrar alguns resultados contraintuitivos.
 
+Obs:
 
-Perguntas para o banco:
-- Da amostra que nos foi enviada, aproximadamente 40% não possui checking_account, é normal?
+1. Para variáveis categóricas, usamos moda;
+2. Para variáveis numéricas, usamos a mediana e o intervalo interquartil (IQR);
+3. Para variáveis numéricas discretas com poucos valores únicos, usamos tanto a moda quanto a mediana.
+
+## 9. Perguntas para o cliente
+
+1. Como mostrado no tópico 3, três colunas tem valores altos de números nulos o que pode prejudicar a análise ou indicam um erro de inserção, ocorreu algum erro na inserção? Caso não seja um erro, tenho uma sugestão nos próximos passos.
+2. Seria possível obter Property em valores? Importante entender o patrimônio.
+3. O que seria retreinamento no propósito de empréstimos?
+4. Não existem mulheres solteiras ou viúvas na base de dados? Caso exista, a nossa amostra não foi o suficiente, precisamos de uma que as contemple para obter melhores análises.
+5. O histórico de crédito anterior (gráfico 5.2) reage de maneira contraintuitiva em relação a bons empréstimos, esse seria o comportamento esperado?
+6. Conforme abordado em 3.1 nas variaveis com alto percetual de valores none, esse é o resultado esperado ou reflete um erro de input? Sendo o resultado experado, na transformação precisaremos fazer ajustes, conforme explicado em mais detalhes abaixo.
+
+## 10. Próximos passos
+
+Na transformação de dados, será necessário ajustar as seguintes colunas:
+
+1. Status_of_existing_checking_account: Aproximadamente 40% da nossa base não possui informação sobre o saldo em conta, tendo em vista que as categorias contemplam saldos negativos, positivos e iguais a zero, podemos deduzir que essas pessoas não tem conta corrente, sendo assim, o melhor para esse caso seria separar essa coluna em duas, possui conta corrente (boolean) e saldo em conta corrente;
+2. Saving_account_bonds: Aproximadamente 18% da nossa base não possui informação sobre o valor em conta poupança ou investimentos, tendo em vista que as categorias contemplam todos os casos de valor, podemos deduzir que essas pessoas não tem conta poupança ou investimentos, sendo assim, o melhor para esse caso seria separar essa coluna em duas, possui conta poupança ou investimentos (boolean) e valor conta poupança ou investimentos;
+3. Property : Aproximadamente 15% da nossa base não possui informação sobre propriedades, as categorias atuais contemplam todos os tipos de propriedades? Não seria possivel obter valores ao invés de categorias? Também podemos separar entre possui propriedades e categoria da propriedade;
+4. Present_employment_since: Separar se está empregado ou não em uma outra coluna (boolean), resultando em empregado e tempo no emprego. 
+5. Other_debtors_guarantors, Other_installment_plans: Precisaremos separar primeiro se existe e depois em categorias, resultado em duas colunas para cada variável.
