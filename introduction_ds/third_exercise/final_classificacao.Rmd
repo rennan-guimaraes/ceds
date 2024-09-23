@@ -1,17 +1,17 @@
 ---
-title: "Terceira Atividade - Validando resultados"
+title: "Terceira Atividade"
 author: "Rennan Guimarães"
 date: "24/09/2024"
 output:
-  pdf_document:
-    toc: true
   html_document:
     toc: true
     toc_float: true
     theme: darkly
+  pdf_document:
+    toc: true
 ---
 
-# Introdução:
+# Introdução
 O objetivo desse trabalho é comparar técnicas de classificação para identificar a melhor opção para a base de dados german.
 
 Para isso, apurei 5 principais métricas: acurácia, f1-score (f_meass), precisão, recall e roc auc.
@@ -20,7 +20,7 @@ Para essas méticas, foram utilizadas 5 técnicas: KNN, Decision tree, LightGBM,
 
 Caso queira partir diretamente para os resultados, intereja com o sumário acima.
 
-Caso esteja queira acessar o código fonte ou a versão em HTML, acesse o [repositório da atividade](https://github.com/rennan-guimaraes/ceds/tree/main/introduction_ds/third_exercise).
+Caso esteja queira acessar o código fonte ou a versão em HTML, acesse o [repositório da atividade](https://github.com/rennan-guimaraes/ceds/tree/main/introduction_ds/third_exercise) e os arquivos para essa atividade serão os nomeados como "final_clasificacao".
 
 # Pré processamento e configurações iniciais
 ```{r libraries, include=FALSE}
@@ -40,7 +40,7 @@ library(caret)
 
 ```{r load_data, include=FALSE}
 german_data <- readRDS("german.rds")
-german_data <- german_data %>%
+german_data <- german_data |>
   mutate(Good_loan = as.factor(Good_loan))
 ```
 
@@ -56,14 +56,14 @@ test_data <- testing(data_split)
 ## Análise de Correlação e Seleção de Variáveis
 
 ```{r correlation}
-numeric_vars <- train_data %>%
+numeric_vars <- train_data |>
   select(where(is.numeric))
 
 correlation_matrix <- cor(numeric_vars, use = "complete.obs")
 
 high_cor_vars <- findCorrelation(correlation_matrix, cutoff = 0.9, names = TRUE)
-train_data <- train_data %>% select(-all_of(high_cor_vars))
-test_data <- test_data %>% select(-all_of(high_cor_vars))
+train_data <- train_data |> select(-all_of(high_cor_vars))
+test_data <- test_data |> select(-all_of(high_cor_vars))
 ```
 
 ## Definindo os Folds para Validação Cruzada
@@ -76,33 +76,33 @@ folds <- vfold_cv(train_data, v = 10, strata = "Good_loan")
 ## Receitas de Pré-processamento
 
 ```{r preprocessing}
-rec <- recipe(Good_loan ~ ., data = train_data) %>%
+rec <- recipe(Good_loan ~ ., data = train_data) |>
   # Imputação
-  step_impute_mode(all_nominal_predictors()) %>%
-  step_impute_median(all_numeric_predictors()) %>%
+  step_impute_mode(all_nominal_predictors()) |>
+  step_impute_median(all_numeric_predictors()) |>
   # Tratamento de outliers usando winsorization
-  step_mutate_at(all_numeric_predictors(), fn = ~scales::squish(.x, quantile(.x, c(0.01, 0.99), na.rm = TRUE))) %>%
+  step_mutate_at(all_numeric_predictors(), fn = ~scales::squish(.x, quantile(.x, c(0.01, 0.99), na.rm = TRUE))) |>
   # Codificação
-  step_dummy(all_nominal_predictors(), one_hot = TRUE) %>%
+  step_dummy(all_nominal_predictors(), one_hot = TRUE) |>
   # Remover variáveis com variância zero
-  step_zv(all_predictors()) %>%
+  step_zv(all_predictors()) |>
   # Tratamento de desbalanceamento
   step_smote(Good_loan)
 ```
 
 ```{r preprocessing-normalized}
-rec_normalized <- recipe(Good_loan ~ ., data = train_data) %>%
+rec_normalized <- recipe(Good_loan ~ ., data = train_data) |>
   # Imputação
-  step_impute_mode(all_nominal_predictors()) %>%
-  step_impute_median(all_numeric_predictors()) %>%
+  step_impute_mode(all_nominal_predictors()) |>
+  step_impute_median(all_numeric_predictors()) |>
   # Tratamento de outliers usando winsorization
-  step_mutate_at(all_numeric_predictors(), fn = ~scales::squish(.x, quantile(.x, c(0.01, 0.99), na.rm = TRUE))) %>%
+  step_mutate_at(all_numeric_predictors(), fn = ~scales::squish(.x, quantile(.x, c(0.01, 0.99), na.rm = TRUE))) |>
   # Codificação
-  step_dummy(all_nominal_predictors(), one_hot = TRUE) %>%
+  step_dummy(all_nominal_predictors(), one_hot = TRUE) |>
   # Remover variáveis com variância zero
-  step_zv(all_predictors()) %>%
+  step_zv(all_predictors()) |>
   # Normalização
-  step_normalize(all_numeric_predictors()) %>%
+  step_normalize(all_numeric_predictors()) |>
   # Tratamento de desbalanceamento
   step_smote(Good_loan)
 ```
@@ -111,9 +111,9 @@ rec_normalized <- recipe(Good_loan ~ ., data = train_data) %>%
 
 ```{r collect_metrics}
 collect_resample_metrics <- function(tune_results, best_params, model_name) {
-  tune_results %>%
-    collect_metrics(summarize = FALSE) %>%
-    inner_join(best_params, by = names(best_params)) %>%
+  tune_results |>
+    collect_metrics(summarize = FALSE) |>
+    inner_join(best_params, by = names(best_params)) |>
     mutate(Model = model_name)
 }
 ```
@@ -127,12 +127,12 @@ knn_model <- nearest_neighbor(
   neighbors = tune(),
   weight_func = tune(),
   dist_power = tune()
-) %>%
-  set_engine("kknn") %>%
+) |>
+  set_engine("kknn") |>
   set_mode("classification")
 
-workflow_knn <- workflow() %>%
-  add_model(knn_model) %>%
+workflow_knn <- workflow() |>
+  add_model(knn_model) |>
   add_recipe(rec)
 
 knn_params <- parameters(knn_model)
@@ -159,12 +159,12 @@ dt_model <- decision_tree(
   cost_complexity = tune(),
   tree_depth = tune(),
   min_n = tune()
-) %>%
-  set_engine("rpart") %>%
+) |>
+  set_engine("rpart") |>
   set_mode("classification")
 
-workflow_dt <- workflow() %>%
-  add_model(dt_model) %>%
+workflow_dt <- workflow() |>
+  add_model(dt_model) |>
   add_recipe(rec)
 
 dt_params <- parameters(dt_model)
@@ -192,15 +192,15 @@ rf_model <- rand_forest(
   mtry = tune(),
   trees = tune(),
   min_n = tune()
-) %>%
-  set_engine("ranger", importance = "impurity") %>%
+) |>
+  set_engine("ranger", importance = "impurity") |>
   set_mode("classification")
 
-workflow_rf <- workflow() %>%
-  add_model(rf_model) %>%
+workflow_rf <- workflow() |>
+  add_model(rf_model) |>
   add_recipe(rec)
 
-rf_params <- parameters(rf_model) %>%
+rf_params <- parameters(rf_model) |>
   update(
     mtry = mtry(range = c(1, floor(sqrt(ncol(train_data))))),
     trees = trees(range = c(500, 2000)),
@@ -233,15 +233,15 @@ lightgbm_model <- boost_tree(
   min_n = tune(),
   sample_size = tune(),
   mtry = tune()
-) %>%
-  set_engine("lightgbm") %>%
+) |>
+  set_engine("lightgbm") |>
   set_mode("classification")
 
-workflow_lightgbm <- workflow() %>%
-  add_model(lightgbm_model) %>%
+workflow_lightgbm <- workflow() |>
+  add_model(lightgbm_model) |>
   add_recipe(rec)
 
-lightgbm_params <- parameters(lightgbm_model) %>%
+lightgbm_params <- parameters(lightgbm_model) |>
   update(
     trees = trees(range = c(500, 2000)),
     tree_depth = tree_depth(range = c(1, 15)),
@@ -278,15 +278,15 @@ xgb_model <- boost_tree(
   sample_size = tune(),
   mtry = tune(),
   min_n = tune()
-) %>%
-  set_engine("xgboost") %>%
+) |>
+  set_engine("xgboost") |>
   set_mode("classification")
 
-workflow_xgb <- workflow() %>%
-  add_model(xgb_model) %>%
+workflow_xgb <- workflow() |>
+  add_model(xgb_model) |>
   add_recipe(rec_normalized)
 
-xgb_params <- parameters(xgb_model) %>%
+xgb_params <- parameters(xgb_model) |>
   update(
     trees = trees(range = c(500, 2000)),
     tree_depth = tree_depth(range = c(1, 15)),
@@ -313,9 +313,7 @@ xgb_resample_metrics <- collect_resample_metrics(xgb_results, best_xgb, "XGBoost
 ```
 # Avaliando resultados do treinamento
 
-## Combinando as Métricas de Resample
-
-```{r}
+```{r include=FALSE}
 resample_metrics_all <- bind_rows(
   knn_resample_metrics,
   dt_resample_metrics,
@@ -325,41 +323,38 @@ resample_metrics_all <- bind_rows(
 )
 ```
 
-## Calculando a Média e Variância das Métricas
+## Média e Variância das Métricas
 
-```{r}
-metrics_summary <- resample_metrics_all %>%
-  group_by(Model, .metric) %>%
+```{r include=FALSE}
+metrics_summary <- resample_metrics_all |>
+  group_by(Model, .metric) |>
   summarize(
     mean = mean(.estimate),
     variance = var(.estimate),
     sd = sd(.estimate),
     .groups = 'drop'
-  ) %>%
+  ) |>
   mutate(
     formatted = glue("{round(mean, 2)} ± {round(sd, 2)}")
   )
 
-metrics_table <- metrics_summary %>%
-  select(Model, .metric, formatted) %>%
+metrics_table <- metrics_summary |>
+  select(Model, .metric, formatted) |>
   pivot_wider(names_from = .metric, values_from = formatted)
 
-print(metrics_table)
-
 # Gráfico boxplot de AUC por modelo
-resample_auc <- resample_metrics_all %>%
+resample_auc <- resample_metrics_all |>
   filter(.metric == "roc_auc")
+```
 
+```{r}
+print(metrics_table)
 ggplot(resample_auc, aes(x = Model, y = .estimate, fill = Model)) +
   geom_boxplot(show.legend = FALSE) +
   theme_minimal() +
   labs(title = "Variabilidade da AUC entre Folds", y = "AUC", x = "") +
   scale_y_continuous(labels = scales::number_format(accuracy = 0.001))
 ```
-
-# Análise Atualizada dos Modelos de Machine Learning na Base German Credit
-
-## Analisando Resultados
 
 1. **Acurácia**: 
    - Random Forest mantém a melhor acurácia (0.75 ± 0.03), seguido pelo LightGBM (0.72 ± 0.03).
@@ -380,7 +375,7 @@ ggplot(resample_auc, aes(x = Model, y = .estimate, fill = Model)) +
    - Random Forest e KNN lideram (0.75 ± 0.05 e 0.73 ± 0.04, respectivamente).
    - O boxplot revela que Random Forest tem a distribuição de AUC mais alta, mas também a maior variabilidade.
 
-## Considerações Revisadas
+## Considerações
 
 1. **Trade-offs**: 
    - O trade-off entre precisão e recall permanece evidente, especialmente para Random Forest e KNN.
@@ -397,7 +392,7 @@ ggplot(resample_auc, aes(x = Model, y = .estimate, fill = Model)) +
    - A alta variabilidade do Random Forest, visível tanto nas métricas tabulares quanto no boxplot, reforça a necessidade de cautela ao considerá-lo como o melhor modelo.
    - O boxplot evidencia que modelos como LightGBM e XGBoost oferecem um equilíbrio melhor entre desempenho e estabilidade.
 
-## Conclusão Revisada
+## Conclusão
 
 Considerando tanto as métricas tabulares quanto a variabilidade da AUC entre folds:
 
@@ -413,7 +408,7 @@ Para o contexto da base German Credit, onde o equilíbrio e a consistência são
 
 # Teste
 
-## Ajuste Final e Avaliação no Conjunto
+## Ajuste Final e Avaliação
 
 ```{r}
 # Ajuste final para cada modelo
@@ -440,15 +435,15 @@ extract_final_metrics <- function(final_workflow, model_name) {
     metrics = metric_set(roc_auc, accuracy, yardstick::precision, yardstick::recall, f_meas)
   )
   
-  metrics <- collect_metrics(last_fit_result) %>%
+  metrics <- collect_metrics(last_fit_result) |>
     mutate(Model = model_name)
   
   predictions <- collect_predictions(last_fit_result)
   
-  confusion <- predictions %>%
+  confusion <- predictions |>
     conf_mat(truth = Good_loan, estimate = .pred_class)
   
-  roc_curve_data <- predictions %>%
+  roc_curve_data <- predictions |>
     roc_curve(truth = Good_loan, .pred_yes)
   
   roc_plot <- autoplot(roc_curve_data) +
@@ -461,23 +456,24 @@ extract_final_metrics <- function(final_workflow, model_name) {
 results_list <- map2(final_workflows, names(final_workflows), extract_final_metrics)
 ```
 
-## Compilando as Métricas do Conjunto de Teste e avaliando resultados
+## Compilando as Métricas do Conjunto de Teste
 
-```{r}
+```{r include=FALSE}
 # Compilar métricas em uma única tabela
 test_metrics <- bind_rows(
   lapply(results_list, function(x) x$metrics)
-) %>%
-  select(Model, .metric, .estimate) %>%
+) |>
+  select(Model, .metric, .estimate) |>
   pivot_wider(names_from = .metric, values_from = .estimate)
-
-print(test_metrics)
 
 # Plotar curvas ROC
 roc_plots <- lapply(results_list, function(x) x$roc_plot)
+```
+
+```{r}
+print(test_metrics)
 do.call(grid.arrange, c(roc_plots, ncol = 2))
 ```
-## Análise dos Resultados
 
 1. **Acurácia**: 
    - LightGBM apresenta a melhor acurácia (0.745), seguido de perto por Random Forest (0.735) e XGBoost (0.730).
@@ -515,11 +511,11 @@ do.call(grid.arrange, c(roc_plots, ncol = 2))
 
 5. **Considerações Finais**: A escolha final do modelo para o desenvolvimento do restante do relatório será pelo modelo LightGBM, que obteve resultados consistentes entre as métricas e se destacou por uma acurácia e roc auc melhor.
 
-## Selecionando o melhor modelo
+# Selecionando o melhor modelo
 ```{r}
 # Selecionar o modelo com a maior AUC
-best_model_name <- test_metrics %>%
-  filter(roc_auc == max(roc_auc)) %>%
+best_model_name <- test_metrics |>
+  filter(roc_auc == max(roc_auc)) |>
   pull(Model)
 
 cat("O melhor modelo é:", best_model_name, "\n")
@@ -532,50 +528,45 @@ final_workflow_to_deploy <- final_workflows[[best_model_name]]
 
 full_train_data <- bind_rows(train_data, test_data)
 
-final_recipe <- recipe(Good_loan ~ ., data = full_train_data) %>%
-  # Copie os mesmos passos da receita original
+final_recipe <- recipe(Good_loan ~ ., data = full_train_data) |>
   # Imputação
-  step_impute_mode(all_nominal_predictors()) %>%
-  step_impute_median(all_numeric_predictors()) %>%
+  step_impute_mode(all_nominal_predictors()) |>
+  step_impute_median(all_numeric_predictors()) |>
   # Tratamento de outliers usando winsorization
-  step_mutate_at(all_numeric_predictors(), fn = ~scales::squish(.x, quantile(.x, c(0.01, 0.99), na.rm = TRUE))) %>%
+  step_mutate_at(all_numeric_predictors(), fn = ~scales::squish(.x, quantile(.x, c(0.01, 0.99), na.rm = TRUE))) |>
   # Codificação
-  step_dummy(all_nominal_predictors(), one_hot = TRUE) %>%
+  step_dummy(all_nominal_predictors(), one_hot = TRUE) |>
   # Remover variáveis com variância zero
-  step_zv(all_predictors()) %>%
+  step_zv(all_predictors()) |>
   # Tratamento de desbalanceamento
   step_smote(Good_loan)
 
 # Atualizar o workflow com a nova receita
-final_workflow_to_deploy <- final_workflow_to_deploy %>%
+final_workflow_to_deploy <- final_workflow_to_deploy |>
   update_recipe(final_recipe)
 
 # Ajustar o modelo final
-final_model <- final_workflow_to_deploy %>% fit(data = full_train_data)
+final_model <- final_workflow_to_deploy |> fit(data = full_train_data)
 ```
 
 ```{r}
-# Como o professor pediu para ser só um exemplo de deploy, vamos utilizar uma parte dos dados do conjunto que já utilizamos no treinamento, entretanto isso não deve ser feito na prática.
-set.seed(17)  # Para reprodutibilidade
-new_data <- full_train_data %>%
-  sample_n(10) %>%  # Seleciona 10 amostras aleatórias
-  select(-Good_loan)  # Remove a variável alvo
+# Como o professor pediu para ser só um exemplo de deploy, vamos utilizar 
+# uma parte dos dados do conjunto que já utilizamos no treinamento, entretanto 
+# isso não deve ser feito na prática.
+set.seed(17)
+new_data <- full_train_data |>
+  sample_n(10) |>
+  select(-Good_loan)
 
-# Fazer previsões
 predictions <- predict(final_model, new_data, type = "prob")
-
-# Exibir as previsões
 print(predictions)
 
-# Combinar as previsões com os dados originais para melhor visualização
 results <- bind_cols(
   new_data,
   predictions
 )
-
-# Exibir os resultados
 print(results)
 
 # Salvar o modelo para uso futuro
-saveRDS(final_model, "german_credit_final_model.rds")
+saveRDS(final_model, "final_classificacao_model.rds")
 ```
