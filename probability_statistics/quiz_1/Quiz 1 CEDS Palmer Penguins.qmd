@@ -116,14 +116,23 @@ O comando `geom_rug()` fornece um diagrama de dispersão unidimensional para a v
 #|   - (bins = 50)
 #| warning: false
 
-# Histograma de `body_mass_g`
-geom_histogram(penguins)
+# Histograma de `body_mass_g` (bins = 5)
+ggplot(penguins, aes(x = body_mass_g)) +
+  geom_histogram(bins = 5) +
+  geom_density(color = "blue") +
+  geom_rug()
 
-# Histograma de `body_mass_g`
+# Histograma de `body_mass_g` (bins = 15)
+ggplot(penguins, aes(x = body_mass_g)) +
+  geom_histogram(bins = 15) +
+  geom_density(color = "blue") +
+  geom_rug()
 
-
-# Histograma de `body_mass_g`
-
+# Histograma de `body_mass_g` (bins = 50)
+ggplot(penguins, aes(x = body_mass_g)) +
+  geom_histogram(bins = 50) +
+  geom_density(color = "blue") +
+  geom_rug()
 ```
 
 
@@ -138,15 +147,12 @@ O gráfico de barras (_barplot_) é uma ferramenta gráfica útil para visualiza
 #| warning: false
 
 penguins %>% 
-  # seleciona variável `island`
-  ???????
-  
-  # conta número de ocorrências em cada uma das classes da variável `island` 
-  table %>%
-  # imprime tabela
-  print %>%
-  # constrói barplot
-    ???????
+  select(island) %>%
+  table() %>%
+  print() %>%
+  barplot(main = "Número de pinguins por ilha", 
+          xlab = "Ilha", 
+          ylab = "Número de pinguins")
 ```
 
 ## Medidas de Tendência Central
@@ -179,17 +185,25 @@ Interprete a distribuição dos dados que construir.
 #| fig-cap: Medidas de centro ou localização para variável `body_mass_g`.
 #| warning: false
 
+media <- mean(penguins$body_mass_g, na.rm = TRUE)
+mediana <- median(penguins$body_mass_g, na.rm = TRUE)
+moda <- as.numeric(names(which.max(table(penguins$body_mass_g))))
 
+ggplot(penguins, aes(x = body_mass_g)) +
+  geom_histogram(binwidth = 200, fill = "lightblue", color = "black") +
+  geom_vline(aes(xintercept = media, color = "Média"), linetype = "dashed", size = 1) +
+  geom_vline(aes(xintercept = mediana, color = "Mediana"), linetype = "dashed", size = 1) +
+  geom_vline(aes(xintercept = moda, color = "Moda"), linetype = "dashed", size = 1) +
+  scale_color_manual(name = "Medidas", 
+                     values = c("Média" = "red", "Mediana" = "blue", "Moda" = "green")) +
+  labs(title = "Distribuição da massa corporal dos pinguins",
+       x = "Massa corporal (g)",
+       y = "Frequência") +
+  theme_minimal()
 
-
-
-
-
-
-
-
-
-
+cat("Média:", media, "\n")
+cat("Mediana:", mediana, "\n")
+cat("Moda:", moda, "\n")
 ```
 
 
@@ -245,14 +259,13 @@ O código a seguir pode ser utilizado para produzir os boxplots para as variáve
 #|   - "`bill_length_mm`"
 #| warning: false
 
+ggplot(penguins, aes(y = body_mass_g)) +
+  geom_boxplot() +
+  labs(title = "Boxplot de body_mass_g", y = "Massa corporal (g)")
 
-
-
-
-
-
-
-
+ggplot(penguins, aes(y = bill_length_mm)) +
+  geom_boxplot() +
+  labs(title = "Boxplot de bill_length_mm", y = "Comprimento do bico (mm)")
 ```
 
 
@@ -267,28 +280,26 @@ Podemos visualizar a expectativa de vida média e desvio-padrão por continente,
 # Resumo numérico
 body_mass_g_by_island <- penguins %>%
   group_by(island) %>%
-  ???????
-  
-  
-  
-  
-  
-  
+  summarise(
+    avg_body_mass_g = mean(body_mass_g, na.rm = TRUE),
+    sd_body_mass_g = sd(body_mass_g, na.rm = TRUE),
+    se_body_mass_g = sd_body_mass_g / sqrt(n())
+  )
+
+print(body_mass_g_by_island)
 ```
 
 
 ```{r}
 #| label: fig-penguins-barplot-island-body_mass_g
-#| fig-cap: Expectativa de vida média e desvio-padrão em diferentes ilhas
+#| fig-cap: Massa corporal média e desvio-padrão em diferentes ilhas
 #| warning: false
 
 ggplot(body_mass_g_by_island, aes(x = island, y = avg_body_mass_g)) +
-  # gera gráfico de barras
-    ???????
-  # adiciona barras de erros (largura de 2 desvios-padrão)
-    ???????
-                     ymax = avg_body_mass_g + se_body_mass_g), width = 0.1) +
-  labs(x = "average body_mass_g", y = "island")
+  geom_bar(stat = "identity", fill = "skyblue") +
+  geom_errorbar(aes(ymin = avg_body_mass_g - se_body_mass_g, 
+                    ymax = avg_body_mass_g + se_body_mass_g), width = 0.1) +
+  labs(x = "Ilha", y = "Massa corporal média (g)")
 ```
 
 
@@ -297,8 +308,9 @@ ggplot(body_mass_g_by_island, aes(x = island, y = avg_body_mass_g)) +
 #| fig-cap: Comparação das distribuições de `body_mass_g` para diferentes ilhas utilizando _boxplots_.
 #| warning: false
 
-
-  ???????
+ggplot(penguins, aes(x = island, y = body_mass_g)) +
+  geom_boxplot() +
+  labs(x = "Ilha", y = "Massa corporal (g)")
 ```
 
 Podemos perceber como variam as distribuições e as medianas observadas para expectativa de vida dependendo do continente. Embora não seja possível afirmar que existe uma diferença estatisticamente significativa entre os grupos, esta é uma hipótese interessante, que pode ser testada de maneira formal posteriormente.
@@ -310,16 +322,12 @@ Alternativamente, podemos comparar as densidades estimadas para a expectativa de
 #| fig-cap: Comparação das distribuições de `body_mass_g` para diferentes ilhas utilizando densidades estimadas.
 #| warning: false
 
-
-
-
-
-
+ggplot(penguins, aes(x = body_mass_g, fill = island)) +
+  geom_density(alpha = 0.5) +
+  labs(x = "Massa corporal (g)", y = "Densidade")
 ```
 
 Neste exemplo, temos em um único gráfico representações das distribuições de `body_mass_g` para países de diferentes ilhas A escolha da melhor ferramenta de visualização depende de cada caso.
-
-
 
 **Relações entre Variáveis**
 
@@ -330,12 +338,11 @@ Para avaliar a relação entre pares de variáveis quantitativas, é útil utili
 #| fig-cap: Variação temporal do body_mass_g.
 #| warning: false
 
-
-
-
-
-
- 
+ggplot(penguins, aes(x = year, y = body_mass_g)) +
+  geom_point() +
+  geom_smooth(method = "lm", color = "blue") +
+  geom_smooth(color = "red") +
+  labs(x = "Ano", y = "Massa corporal (g)")
 ```
 
 As curvas correspondem a tendências na variação da expectativa de vida, para diferentes anos. A curva azul corresponde a uma aproximação linear para a tendência, enquanto a curva vermelha corresponde a uma tendência suavizada.
@@ -347,11 +354,13 @@ Para visualizar como a expectativa de vida média variou ao longo do tempo para 
 #| fig-cap: Variação temporal no peso por ilha
 #| warning: false
 
-
-
-
-
-
+penguins %>%
+  group_by(year, island) %>%
+  summarise(avg_body_mass_g = mean(body_mass_g, na.rm = TRUE)) %>%
+  ggplot(aes(x = year, y = avg_body_mass_g, color = island)) +
+  geom_line() +
+  geom_point() +
+  labs(x = "Ano", y = "Massa corporal média (g)")
 ```
 
 Podemos também visualizar como a massa corporal se relaciona com o comprimento das nadadeiras(`flipper_length_mm`):
@@ -366,15 +375,20 @@ Podemos também visualizar como a massa corporal se relaciona com o comprimento 
 #| warning: false
 
 # dados originais
-  ???????
+ggplot(penguins, aes(x = flipper_length_mm, y = body_mass_g)) +
+  geom_point() +
+  labs(x = "Comprimento das nadadeiras (mm)", y = "Massa corporal (g)")
 
-# adiciona cor por continentes
-  ???????
+# adiciona cor por ilhas
+ggplot(penguins, aes(x = flipper_length_mm, y = body_mass_g, color = island)) +
+  geom_point() +
+  labs(x = "Comprimento das nadadeiras (mm)", y = "Massa corporal (g)")
 
 # transforma escala
-  ???????
-  
-  
+ggplot(penguins, aes(x = flipper_length_mm, y = body_mass_g, color = island)) +
+  geom_point() +
+  scale_y_log10() +
+  labs(x = "Comprimento das nadadeiras (mm)", y = "Massa corporal (g) (log)")
 ```
 
 Alternativamente, podemos analisar como a massa corporal se relaciona com o comprimento das nadadeiras para diferentes ilhas, utilizando diferentes paineis:
@@ -384,13 +398,11 @@ Alternativamente, podemos analisar como a massa corporal se relaciona com o comp
 #| fig-cap: Relação entre peso e flipper_length_mm para diferentes ilhas
 #| warning: false
 
-
-
-
-
-
+ggplot(penguins, aes(x = flipper_length_mm, y = body_mass_g)) +
+  geom_point() +
+  facet_wrap(~island) +
+  labs(x = "Comprimento das nadadeiras (mm)", y = "Massa corporal (g)")
 ```
-
 
 A seguir, vamos analisar apenas os dados correspondentes ao ano de 2007. Para a visualização, é removida a variável `sex`. A matriz de gráficos de dispersão abaixo permite visualizar a relação estatística entre diferentes pares de variáveis.
 
@@ -401,16 +413,11 @@ A seguir, vamos analisar apenas os dados correspondentes ao ano de 2007. Para a 
 #| fig-cap: Matriz de gráficos de dispersão para massa de dados `penguins` (biblioteca `base R`)
 #| warning: false
 
-# cria nova massa de dados com as observações correspondentes ao ano de 2007
+penguins_2007 <- penguins %>% 
+  filter(year == 2007) %>%
+  select(-year, -sex)
 
-
-
-
-# Matriz de gráficos de dispersão (base R)
-
-
-
-
+pairs(penguins_2007)
 ```
 
 Examinar as relações entre os pares de variáveis pode exigir tempo e esforço adicionais, embora os ganhos sejam muitos, incluindo uma melhor avaliação das relações marginais entre as variáveis. Note que parece existir algum tipo de relação estatística entre a variável `lifeExp` e algumas das demais variáveis consideradas.
@@ -426,16 +433,8 @@ Alternativamente, podemos construir a matriz de gráficos de dispersão utilizan
 
 library(GGally)
 
-# Matriz de gráficos de dispersão (GGali)
-  ???????
-  
-  
-  
-  
+ggpairs(penguins_2007)
 ```
-
-
-
 
 Podemos ainda examinar a relação entre duas variáveis, condicionando a uma outra variável categórica. Por exemplo, podemos construir um gráfico que evidencia a relação entre `body_mass_g` e `flipper_length_mm`, para cada nível da variável `ilha`.
 
@@ -445,26 +444,7 @@ Podemos ainda examinar a relação entre duas variáveis, condicionando a uma ou
 #| warning: false
 
 ggplot(penguins_2007, aes(x = flipper_length_mm, y = body_mass_g)) +
-  # adiciona pontos 
-  # (cores e símbolos distintos para diferentes classes da variável `continent`)
   geom_point(aes(color = island, shape = island)) + 
-  # adiciona retas de tendência
-    ???????
+  geom_smooth(method = "lm", aes(color = island)) +
+  labs(x = "Comprimento das nadadeiras (mm)", y = "Massa corporal (g)")
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
