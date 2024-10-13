@@ -1,0 +1,362 @@
+---
+Encoding: UTF-8 Unicode
+lang: pt  
+title: "CEDS (2024): Probabilidade e Estatística"
+subtitle: "QUIZ 1" 
+author: "Rennan Dalla Guimarães"
+date: 2024-10-14
+date-format: YYYY[ / 2o. semestre]
+format:
+  html:
+    theme: cosmo
+    toc: true
+execute:
+  echo: true
+  eval: true
+  warning: false    
+---
+
+## Introdução
+
+O objetivo desse trabalho é estudar algumas ferramentas computacionais para vizualizar, explorar, resumir e descrever um conjunto de dados.
+
+Os dados foram coletados pelo Dr. Kristen Gorman e sua equipe, e disponibilizados pelo pacote *palmerpenguins* no R.
+
+Caso esteja com dificuldade de acessar algum arquivo, tanto a versão em htm e qmd estão disponíveis no [repositótio do projeto](https://github.com/rennan-guimaraes/ceds/tree/main/probability_statistics/quiz_1)
+
+```{r include=FALSE}
+library(tidyverse)
+library(gapminder)
+library(palmerpenguins)
+library(dplyr)
+library(knitr)
+```
+
+## Observação inicial do conjunto de dados
+
+### Carregar e Verificar a Tabela de Dados
+```{r}
+data(penguins)
+glimpse(penguins)
+```
+
+### Obtenção de informações básicas a respeito da massa de dados:
+```{r}
+# verifica início da tabela
+head(penguins)
+
+# verifica final da tabela
+tail(penguins)
+
+# nomes das variáveis
+names(penguins)
+
+# número de colunas (variáveis)
+ncol(penguins)
+
+# número de observações
+nrow(penguins)
+
+# dimensões da tabela
+dim(penguins)
+```
+
+### Tabela com as Primeiras 25 Observações da Massa de Dados:
+
+```{r}
+#| label: tbl-penguins
+#| tbl-cap: Conjunto de dados `penguins` (primeiras 25 observações).
+
+# gera tabela de dados
+kable(head(penguins, n = 25))
+```
+
+## Resumos Unidimensionais
+
+### Distribuição
+
+#### Variáveis Quantitativas
+
+```{r}
+#| label: fig-palmerpenguins-hist-body_mass_g
+#| layout-ncol: 3
+#| fig-asp: 0.75
+#| fig-cap: Histogramas de `body_mass_g` para diferentes números de bins
+#| fig-subcap: 
+#|   - (bins = 5)
+#|   - (bins = 15)
+#|   - (bins = 50)
+#| warning: false
+
+# Histograma de `body_mass_g` com bins = 5
+ggplot(penguins, aes(x = body_mass_g)) +
+  geom_histogram(aes(y = after_stat(density)), bins = 5) +
+  # adiciona linha de densidade estimada (suavização)
+  geom_density(lwd = 0.5, colour = "blue", fill = "blue", alpha = 0.25, adjust = 2.5) +
+  # adiciona dispersão unidimensional de `body_mass_g`
+  geom_rug(alpha = 0.5)
+
+# Histograma de `body_mass_g` com bins = 15
+ggplot(penguins, aes(x = body_mass_g)) +
+  geom_histogram(aes(y = after_stat(density)), bins = 15) +
+  geom_density(lwd = 0.5, colour = "blue", fill = "blue", alpha = 0.25, adjust = 2.5) +
+  geom_rug(alpha = 0.5)
+
+# Histograma de `body_mass_g` com bins = 50
+ggplot(penguins, aes(x = body_mass_g)) +
+  geom_histogram(aes(y = after_stat(density)), bins = 50) +
+  geom_density(lwd = 0.5, colour = "blue", fill = "blue", alpha = 0.25, adjust = 2.5) +
+  geom_rug(alpha = 0.5)
+```
+
+#### Variáveis Qualitativas
+
+```{r}
+#| label: fig-penguins-barplot-island
+#| fig-asp: 0.75
+#| fig-cap: Número de ocorrências em cada classe da variável `island`.
+#| warning: false
+
+penguins %>% 
+  # seleciona variável `island`
+  select(island) %>%
+  # conta número de ocorrências em cada uma das classes da variável `island` 
+  table %>%
+  # imprime tabela
+  print %>%
+  # constrói barplot
+  barplot()
+```
+
+## Medidas de Tendência Central
+
+```{r}
+#| label: fig-medidas-localizacao-body_mass_g
+#| fig-asp: 0.75
+#| fig-cap: Medidas de centro ou localização para variável `body_mass_g`.
+#| warning: false
+
+body_mass_g <- penguins$body_mass_g
+density_estimate <- density(body_mass_g, na.rm = TRUE)
+mean_value   <- mean(body_mass_g, na.rm = TRUE)
+median_value <- median(body_mass_g, na.rm = TRUE)
+mode_value   <- density_estimate$x[which.max(density_estimate$y)]
+
+ggplot(penguins, aes(x = body_mass_g)) +
+  geom_histogram(aes(y = after_stat(density)), bins = 15, na.rm = TRUE) +
+  # adiciona linha de densidade estimada (suavização)
+  geom_density(lwd = 0.5, fill = "blue", alpha = 0.25, na.rm = TRUE) +
+  # adiciona dispersão unidimensional de `body_mass_g`
+  geom_rug(alpha = 0.5, na.rm = TRUE) +
+  # adiciona "média"
+  geom_vline(aes(xintercept = mean_value, color = "média"),
+             lwd = 1.5, show.legend = TRUE) + 
+  # adiciona "mediana"
+  geom_vline(aes(xintercept = median_value, color = "mediana"),
+             lwd = 1.5, show.legend = TRUE) +
+  # adiciona "moda"
+  geom_vline(aes(xintercept = mode_value, color = "moda"), 
+             lwd = 1.5, show.legend = TRUE) +
+  labs(x = "body_mass_g") +
+  scale_color_manual(name = "Medidas de Tendência Central", values = c("média" = "red", "mediana" = "green", "moda" = "blue"))
+```
+
+### Interpretação
+
+Trata-se de uma distribuição assimétrica positiva, com uma cauda mais longa à direita. A posição relativa das medidas de tendência central confirma a assimetria positiva (moda < mediana < média).
+
+#### Medidas de Posição Relativa e Outliers
+
+```{r}
+#| label: fig-penguins-boxplot-body_mass_g
+#| fig-height: 2
+#| fig-cap: Boxplot de `body_mass_g` e `bill_length_mm`.
+#| fig-subcap: 
+#|   - "`body_mass_g`"
+#|   - "`bill_length_mm`"
+#| warning: false
+
+# Boxplot de `body_mass_g`
+ggplot(penguins, aes(x = body_mass_g, y = "")) +
+  geom_boxplot(na.rm = TRUE) +
+  labs(y = "", x = "body_mass_g")
+
+# Boxplot de `bill_length_mm`
+ggplot(penguins, aes(x = bill_length_mm, y = "")) +
+  geom_boxplot(na.rm = TRUE) +
+  labs(y = "", x = "bill_length_mm")
+
+summary(penguins)
+```
+
+## Resumos Multidimensionais
+
+```{r}
+# Resumo numérico
+body_mass_g_by_island <- penguins %>%
+  group_by(island) %>%
+  summarize(avg_body_mass_g = mean(body_mass_g, na.rm = TRUE), 
+            se_body_mass_g = sd(body_mass_g, na.rm = TRUE))
+
+body_mass_g_by_island
+```
+
+```{r}
+#| label: fig-penguins-barplot-island-body_mass_g
+#| fig-cap: Massa corporal média e desvio-padrão em diferentes ilhas
+#| warning: false
+
+ggplot(body_mass_g_by_island, aes(x = island, y = avg_body_mass_g)) +
+  # gera gráfico de barras
+  geom_col() +
+  # adiciona barras de erros (largura de 2 desvios-padrão)
+  geom_errorbar(aes(ymin = avg_body_mass_g - se_body_mass_g, 
+                    ymax = avg_body_mass_g + se_body_mass_g), width = 0.1) +
+  labs(x = "Ilha", y = "Massa Corporal Média (g)")
+```
+
+```{r}
+#| label: fig-penguins-boxplot-island-body_mass_g
+#| fig-cap: Comparação das distribuições de `body_mass_g` para diferentes ilhas utilizando _boxplots_.
+#| warning: false
+
+ggplot(penguins, aes(x = island, y = body_mass_g, fill = island)) +
+  geom_boxplot(na.rm = TRUE) +
+  labs(x = "Ilha", y = "Massa Corporal (g)")
+```
+
+```{r}
+#| label: fig-penguins-density-island-body_mass_g
+#| fig-cap: Comparação das distribuições de `body_mass_g` para diferentes ilhas utilizando densidades estimadas.
+#| warning: false
+
+ggplot(penguins, aes(x = body_mass_g, fill = island)) +
+  geom_density(alpha = 0.5, position = "identity", na.rm = TRUE) +
+  labs(x = "Massa Corporal (g)")
+```
+
+### Relações entre Variáveis
+
+Como a massa corporal mudou com o tempo:
+
+```{r}
+#| label: fig-penguins-tendencia
+#| fig-cap: Variação temporal do `body_mass_g`.
+#| warning: false
+
+ggplot(penguins, aes(x = year, y = body_mass_g)) +
+  geom_point(alpha = 0.3, na.rm = TRUE) +
+  # inclui reta de tendência
+  geom_smooth(method = "lm", se = FALSE, na.rm = TRUE) + 
+  # inclui linha de tendência suave
+  geom_smooth(color = "red", se = FALSE, na.rm = TRUE) +
+  labs(x = "Ano", y = "Massa Corporal (g)")
+```
+As curvas correspondem a tendências na variação da expectativa de vida, para diferentes anos. A curva azul corresponde a uma aproximação linear para a tendência, enquanto a curva vermelha corresponde a uma tendência suavizada.
+
+Para visualizar como a expectativa de vida média variou ao longo do tempo para cada ilha, podemos utilizar um gráfico de linhas:
+
+```{r}
+#| label: fig-penguins-tendencia-island
+#| fig-cap: Variação temporal do peso por ilha
+#| warning: false
+
+body_mass_g_by_island_year <- penguins %>%
+  group_by(island, year) %>%
+  summarize(avg_body_mass_g = mean(body_mass_g, na.rm = TRUE))
+
+ggplot(body_mass_g_by_island_year, aes(x = year, y = avg_body_mass_g, color = island)) +
+  geom_line() +
+  geom_point(alpha = 0.3) +
+  labs(x = "Ano", y = "Massa Corporal Média (g)")
+```
+Podemos também visualizar como a massa corporal se relaciona com o comprimento das nadadeiras(`flipper_length_mm`):
+
+```{r}
+#| label: fig-penguins-body_mass_g-flipper_length_mm
+#| fig-cap: Relação entre peso e `flipper_length_mm`.
+#| fig-subcap: 
+#|   - "dados originais"
+#|   - "adiciona dimensão utilizando cores para diferentes ilhas"
+#|   - "transformando a escala"
+#| warning: false
+
+# dados originais
+ggplot(penguins, aes(x = flipper_length_mm, y = body_mass_g)) +
+  geom_point(alpha = 0.3, na.rm = TRUE)
+
+# adiciona cor por ilhas
+ggplot(penguins, aes(x = flipper_length_mm, y = body_mass_g, color = island)) +
+  geom_point(alpha = 0.3, na.rm = TRUE)
+
+# transforma escala
+ggplot(penguins, aes(x = flipper_length_mm, y = body_mass_g, color = island)) +
+  geom_point(alpha = 0.3, na.rm = TRUE) +
+  scale_x_log10() +
+  labs(x = "Log do Comprimento da Nadadeira (mm)")
+```
+Alternativamente, podemos analisar como a massa corporal se relaciona com o comprimento das nadadeiras para diferentes ilhas, utilizando diferentes paineis:
+
+```{r}
+#| label: fig-penguins-body_mass_g-flipper_length_mm-island
+#| fig-cap: Relação entre peso e `flipper_length_mm` para diferentes ilhas
+#| warning: false
+
+ggplot(penguins, aes(x = flipper_length_mm, y = body_mass_g)) +
+  geom_point(alpha = 0.3, na.rm = TRUE) +
+  facet_wrap(~island) +
+  geom_smooth(method = "lm", se = FALSE, na.rm = TRUE) +
+  labs(x = "Comprimento da Nadadeira (mm)", y = "Massa Corporal (g)")
+```
+A seguir, vamos analisar apenas os dados correspondentes ao ano de 2007. Para a visualização, é removida a variável `sex`. A matriz de gráficos de dispersão abaixo permite visualizar a relação estatística entre diferentes pares de variáveis.
+
+```{r}
+#| label: fig-penguins-scatterplot-base
+#| fig-width: 10
+#| fig-asp: 1
+#| fig-cap: Matriz de gráficos de dispersão para massa de dados `penguins` (biblioteca `base R`)
+#| warning: false
+
+# cria nova massa de dados com as observações correspondentes ao ano de 2007
+penguins_2007 <- penguins %>%
+  filter(year == 2007) %>%
+  select(-year)
+
+# Matriz de gráficos de dispersão (base R)
+penguins_2007 %>% 
+  select(where(is.numeric)) %>% 
+  plot()
+```
+
+Examinar as relações entre os pares de variáveis pode exigir tempo e esforço adicionais, embora os ganhos sejam muitos, incluindo uma melhor avaliação das relações marginais entre as variáveis. Note que parece existir algum tipo de relação estatística entre a variável `lifeExp` e algumas das demais variáveis consideradas.
+
+Alternativamente, podemos construir a matriz de gráficos de dispersão utilizando a biblioteca `GGaly`. Além de resumos gráficos uni- e bi-dimensionais, são apresentadas as correlações entre pares de variáveis quantitativas (aprenderemos mais sobre isto no futuro). 
+
+```{r}
+#| label: fig-penguins-scatterplot-ggally
+#| fig-width: 10
+#| fig-asp: 1
+#| fig-cap: Matriz de gráficos de dispersão para massa de dados `penguins` (biblioteca `GGally`)
+#| warning: false
+
+library(GGally)
+
+# Matriz de gráficos de dispersão (GGally)
+penguins_2007 %>% 
+  select(where(is.numeric)) %>% 
+  ggpairs()
+```
+Podemos ainda examinar a relação entre duas variáveis, condicionando a uma outra variável categórica. Por exemplo, podemos construir um gráfico que evidencia a relação entre `body_mass_g` e `flipper_length_mm`, para cada nível da variável `ilha`.
+
+```{r}
+#| label: fig-penguins-scatterplot-condicional
+#| fig-cap: Condicionando a uma variável categórica.
+#| warning: false
+
+ggplot(penguins_2007, aes(x = flipper_length_mm, y = body_mass_g)) +
+  # adiciona pontos (cores e símbolos distintos para diferentes classes da variável `island`)
+  geom_point(aes(color = island, shape = island), na.rm = TRUE) + 
+  # adiciona retas de tendência
+  geom_smooth(aes(color = island), method = "lm", se = FALSE, na.rm = TRUE) +
+  labs(x = "Comprimento da Nadadeira (mm)", y = "Massa Corporal (g)")
+```
