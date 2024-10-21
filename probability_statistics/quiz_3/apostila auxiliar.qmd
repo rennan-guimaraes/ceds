@@ -1,0 +1,369 @@
+---
+
+title: "Introdução à Probabilidade e Estatística com R"
+author: "Professor"
+date: "`r Sys.Date()`"
+format:
+  html:
+    code-fold: true
+---
+
+# Introdução
+
+Olá! Neste material, iremos explorar conceitos fundamentais de Probabilidade e Estatística, com foco em distribuições de probabilidade, testes de normalidade, identificação de distribuições e ajustes de modelos estatísticos utilizando a linguagem R. O objetivo é fornecer uma compreensão detalhada dos tópicos abordados nos exercícios anteriores, de forma clara e prática.
+
+Utilizaremos exemplos práticos e bibliotecas do R para ilustrar cada conceito, facilitando assim o seu entendimento.
+
+# Tópico 1: Distribuição Normal
+
+A distribuição normal, também conhecida como distribuição de Gauss, é uma das distribuições de probabilidade mais importantes na estatística. Muitas variáveis aleatórias observadas na natureza, economia e outras áreas tendem a seguir uma distribuição normal.
+
+## Características da Distribuição Normal
+
+- **Simetria**: A distribuição normal é simétrica em torno da média.
+- **Média, Mediana e Moda**: Na distribuição normal, esses três valores são iguais.
+- **Curva em formato de sino**: A representação gráfica da distribuição normal é uma curva em formato de sino.
+
+## Função Densidade de Probabilidade (PDF)
+
+A função densidade de probabilidade da distribuição normal é dada por:
+
+$$
+f(x) = \frac{1}{\sigma \sqrt{2\pi}} e^{ -\frac{1}{2} \left( \frac{x - \mu}{\sigma} \right)^2 }
+$$
+
+Onde:
+
+- $\mu$ é a média.
+- $\sigma$ é o desvio padrão.
+
+## Exemplos Práticos
+
+Vamos explorar a distribuição normal utilizando dados simulados e reais.
+
+### Exemplo 1: Simulação de Dados Normais
+
+```{r}
+# Simulando 1000 observações de uma distribuição normal com média 0 e desvio padrão 1
+set.seed(123)
+dados_normais <- rnorm(1000, mean = 0, sd = 1)
+
+# Visualizando os dados
+hist(dados_normais, breaks = 30, probability = TRUE, 
+     main = "Histograma de Dados Normais Simulados", xlab = "Valores")
+
+# Adicionando a curva teórica da distribuição normal
+curve(dnorm(x, mean = 0, sd = 1), col = "red", lwd = 2, add = TRUE)
+```
+
+### Exemplo 2: Testes de Normalidade
+
+Para verificar se um conjunto de dados segue uma distribuição normal, podemos utilizar testes estatísticos como:
+
+- Teste de Shapiro-Wilk
+- Teste de Kolmogorov-Smirnov
+- Teste de Anderson-Darling
+- Teste de Lilliefors
+
+#### Utilizando Dados Reais
+
+Considere o conjunto de dados referente ao tempo de transmissão via satélite:
+
+```{r}
+dados_tempo <- c(149.3355, 140.3779, 145.7254, 149.8931, 139.6168, 149.1934, 129.6147, 134.7523, 
+                 167.8030, 171.7407, 157.5422, 160.2664, 155.4553, 142.5989, 134.9844, 148.5172, 
+                 163.1447, 131.0138, 130.2423, 167.2239, 149.4015, 145.6802, 160.3472, 121.1775, 
+                 136.7295, 162.2381, 150.7192, 117.8144, 137.3630, 158.6373, 168.0833, 133.9263, 
+                 150.9102, 149.4811, 167.4367, 178.0970, 138.4903, 148.6764, 181.0990, 167.3345, 
+                 147.0679, 156.1410, 148.8734, 140.9484, 147.6408, 134.5726, 184.6812, 134.6648, 
+                 146.8130, 167.4161)
+```
+
+#### Teste de Shapiro-Wilk
+
+```{r}
+shapiro.test(dados_tempo)
+```
+
+**Interpretação**: Se o p-valor for maior que 0,05, não rejeitamos a hipótese nula de que os dados seguem uma distribuição normal.
+
+#### Teste de Kolmogorov-Smirnov
+
+```{r}
+ks.test(dados_tempo, "pnorm", mean = mean(dados_tempo), sd = sd(dados_tempo))
+```
+
+**Interpretação**: Similar ao anterior, um p-valor maior que 0,05 indica aderência à normalidade.
+
+#### Teste de Anderson-Darling
+
+```{r}
+library(nortest)
+ad.test(dados_tempo)
+```
+
+#### Teste de Lilliefors
+
+```{r}
+library(nortest)
+lillie.test(dados_tempo)
+```
+
+### Cálculo de Probabilidades na Distribuição Normal
+
+Podemos calcular probabilidades associadas a intervalos utilizando a função de distribuição acumulada (CDF).
+
+#### Exemplo: Probabilidade entre 125 e 150 segundos
+
+```{r}
+media_tempo <- mean(dados_tempo)
+desvio_tempo <- sd(dados_tempo)
+
+probabilidade <- pnorm(150, mean = media_tempo, sd = desvio_tempo) - pnorm(125, mean = media_tempo, sd = desvio_tempo)
+probabilidade
+```
+
+**Interpretando o Resultado**: A probabilidade de uma chamada demorar entre 125 e 150 segundos é de aproximadamente `r round(probabilidade * 100, 2)`%.
+
+#### Visualização Gráfica
+
+```{r}
+# Criando a sequência de valores
+x_vals <- seq(min(dados_tempo), max(dados_tempo), length.out = 1000)
+y_vals <- dnorm(x_vals, mean = media_tempo, sd = desvio_tempo)
+
+# Plotando a curva de densidade
+plot(x_vals, y_vals, type = "l", lwd = 2, col = "blue", 
+     main = "Distribuição Normal do Tempo de Transmissão", xlab = "Tempo (segundos)", ylab = "Densidade")
+
+# Destacando a área entre 125 e 150
+polygon(c(125, seq(125, 150, length.out = 100), 150), 
+        c(0, dnorm(seq(125, 150, length.out = 100), mean = media_tempo, sd = desvio_tempo), 0), 
+        col = "lightblue")
+```
+
+## Resumo
+
+A distribuição normal é fundamental na estatística, e entender como verificar a normalidade dos dados e calcular probabilidades é essencial para análises estatísticas.
+
+# Tópico 2: Identificação de Distribuições
+
+Nem todos os dados seguem uma distribuição normal. É importante ser capaz de identificar qual distribuição melhor se ajusta aos dados.
+
+## Principais Distribuições Contínuas
+
+- **Distribuição Weibull**
+- **Distribuição Gama**
+- **Distribuição Lognormal**
+- **Distribuição Normal**
+
+## Ajuste de Distribuições com o R
+
+Utilizaremos a biblioteca `fitdistrplus` para ajustar distribuições aos dados e comparar qual distribuição melhor se ajusta.
+
+### Exemplo Prático
+
+Considere o seguinte conjunto de dados:
+
+```{r}
+dados_exemplo <- c(1.9993382, 1.4414849, 2.1477166, 2.1087828, 2.1342892, 2.1844835, 1.5091879, 2.0467623, 
+                   1.0642741, 2.1302612, 1.8389897, 1.8924614, 1.9316041, 1.5602204, 1.6991884, 1.7228081, 
+                   1.5197833, 1.7659242, 0.6914335, 1.4598759, 2.0017607, 1.5139209, 1.8334780, 1.8847480, 
+                   1.9072389, 1.6294414, 1.9068617, 1.7744973, 2.4300455, 1.8958270)
+```
+
+### Análise Descritiva
+
+```{r}
+summary(dados_exemplo)
+hist(dados_exemplo, breaks = 10, probability = TRUE, main = "Histograma dos Dados de Exemplo", xlab = "Valores")
+```
+
+### Ajuste das Distribuições
+
+#### Carregando a Biblioteca
+
+```{r}
+library(fitdistrplus)
+```
+
+#### Ajustando Distribuições
+
+```{r}
+ajuste_weibull <- fitdist(dados_exemplo, "weibull")
+ajuste_gamma <- fitdist(dados_exemplo, "gamma")
+ajuste_lognormal <- fitdist(dados_exemplo, "lnorm")
+ajuste_normal <- fitdist(dados_exemplo, "norm")
+```
+
+### Comparação dos Ajustes
+
+#### Critério de Informação de Akaike (AIC)
+
+O AIC é utilizado para comparar modelos; quanto menor o AIC, melhor o ajuste.
+
+```{r}
+aic_values <- data.frame(
+  Distribuição = c("Weibull", "Gamma", "Lognormal", "Normal"),
+  AIC = c(ajuste_weibull$aic, ajuste_gamma$aic, ajuste_lognormal$aic, ajuste_normal$aic)
+)
+aic_values
+```
+
+**Interpretação**: A distribuição com o menor AIC é a que melhor se ajusta aos dados.
+
+#### Teste de Kolmogorov-Smirnov
+
+Para a distribuição com menor AIC, realizamos o teste de Kolmogorov-Smirnov.
+
+```{r}
+ks.test(dados_exemplo, "pweibull", shape = ajuste_weibull$estimate["shape"], scale = ajuste_weibull$estimate["scale"])
+```
+
+**Interpretação**: Se o p-valor for maior que 0,05, não rejeitamos a hipótese de que os dados seguem essa distribuição.
+
+### Visualização do Ajuste
+
+```{r}
+hist(dados_exemplo, breaks = 10, probability = TRUE, main = "Ajuste da Distribuição Weibull", xlab = "Valores")
+curve(dweibull(x, shape = ajuste_weibull$estimate["shape"], scale = ajuste_weibull$estimate["scale"]), 
+      col = "red", lwd = 2, add = TRUE)
+```
+
+## Resumo
+
+Identificar a distribuição adequada é crucial para modelagem estatística. O uso de critérios como o AIC e testes de aderência ajuda nessa identificação.
+
+# Tópico 3: Testes de Normalidade e Intervalos de Confiança
+
+## Testes de Normalidade
+
+Além dos testes mencionados anteriormente, é importante compreender quando e como aplicá-los, bem como suas limitações.
+
+### Exemplo com Dados de Inflação
+
+```{r}
+inflacao <- c(5.91, 6.41, 10.67, 6.29, 2.95, 3.75, 4.31, 4.52, 10.06, 5.79)
+```
+
+#### Teste de Shapiro-Wilk
+
+```{r}
+shapiro.test(inflacao)
+```
+
+#### Teste de Lilliefors
+
+```{r}
+lillie.test(inflacao)
+```
+
+## Intervalos de Confiança
+
+Um intervalo de confiança fornece uma faixa de valores dentro da qual esperamos que um parâmetro populacional (como a média) esteja, com um certo nível de confiança.
+
+### Construção de um Intervalo de Confiança para a Média
+
+#### Exemplo: Intervalo de Confiança de 99% para a Média da Inflação
+
+```{r}
+media_inflacao <- mean(inflacao)
+desvio_inflacao <- sd(inflacao)
+n <- length(inflacao)
+erro_padrao <- desvio_inflacao / sqrt(n)
+t_critico <- qt(0.995, df = n - 1)
+
+limite_inferior <- media_inflacao - t_critico * erro_padrao
+limite_superior <- media_inflacao + t_critico * erro_padrao
+
+cat("Intervalo de Confiança de 99%: [", limite_inferior, ";", limite_superior, "]\n")
+```
+
+## Resumo
+
+Os testes de normalidade e intervalos de confiança são ferramentas essenciais para inferência estatística, permitindo validar suposições e estimar parâmetros populacionais.
+
+# Tópico 4: Prática com Dados Reais
+
+Vamos aplicar o que aprendemos utilizando conjuntos de dados reais.
+
+## Conjunto de Dados (a)
+
+```{r}
+dados_a <- c(20.8625807, 7.2445709, 4.4659396, 3.2712081, 4.9300651, 5.7444213, 6.6700987,
+              11.1750446, 2.3753017, 3.5425386, 0.5978486, 6.8869953, 6.1102197, 8.2716973,
+              9.7465462, 3.3991988, 1.8557047, 11.3983705, 3.6847590, 2.3327479, 6.1364329,
+              4.4686122, 7.8007834, 4.7649257, 3.8829371, 5.9986131, 5.5163819, 9.6951710,
+              10.1645820, 6.1304865)
+```
+
+### Identificação da Distribuição
+
+#### Ajuste e Comparação
+
+```{r}
+ajuste_weibull_a <- fitdist(dados_a, "weibull")
+ajuste_gamma_a <- fitdist(dados_a, "gamma")
+ajuste_lognormal_a <- fitdist(dados_a, "lnorm")
+ajuste_normal_a <- fitdist(dados_a, "norm")
+
+aic_values_a <- data.frame(
+  Distribuição = c("Weibull", "Gamma", "Lognormal", "Normal"),
+  AIC = c(ajuste_weibull_a$aic, ajuste_gamma_a$aic, ajuste_lognormal_a$aic, ajuste_normal_a$aic)
+)
+aic_values_a
+```
+
+#### Conclusão
+
+A distribuição Gama apresenta o menor AIC, indicando o melhor ajuste.
+
+### Teste de Kolmogorov-Smirnov para a Distribuição Gama
+
+```{r}
+ks.test(dados_a, "pgamma", shape = ajuste_gamma_a$estimate["shape"], rate = ajuste_gamma_a$estimate["rate"])
+```
+
+**Interpretação**: Com um p-valor maior que 0,05, não rejeitamos a hipótese de aderência à distribuição Gama.
+
+### Visualização
+
+```{r}
+hist(dados_a, breaks = 10, probability = TRUE, main = "Ajuste da Distribuição Gama", xlab = "Valores")
+curve(dgamma(x, shape = ajuste_gamma_a$estimate["shape"], rate = ajuste_gamma_a$estimate["rate"]), 
+      col = "red", lwd = 2, add = TRUE)
+```
+
+## Aplicação em Outros Conjuntos de Dados
+
+O mesmo processo pode ser repetido para os demais conjuntos de dados (b), (c), (d) e (e), identificando a distribuição que melhor se ajusta e realizando os testes de aderência.
+
+# Conclusão
+
+Neste material, exploramos conceitos fundamentais de Probabilidade e Estatística, com foco em:
+
+- **Distribuição Normal**: Características, testes de normalidade e cálculo de probabilidades.
+- **Identificação de Distribuições**: Ajuste de modelos, comparação via AIC e testes de aderência.
+- **Intervalos de Confiança**: Construção e interpretação para médias populacionais.
+- **Aplicação Prática**: Utilização de bibliotecas do R para análise de dados reais.
+
+Esperamos que este guia tenha proporcionado uma compreensão mais profunda dos tópicos abordados e que os exemplos práticos tenham facilitado o entendimento. A prática constante e a exploração de diferentes conjuntos de dados são essenciais para consolidar o conhecimento em Estatística.
+
+# Referências
+
+- **Livros**:
+  - "Introdução à Probabilidade e Estatística" - William Mendenhall, Robert J. Beaver e Barbara M. Beaver.
+  - "Estatística Aplicada e Probabilidade para Engenheiros" - Douglas C. Montgomery e George C. Runger.
+
+- **Bibliotecas do R**:
+  - `fitdistrplus`: Para ajuste de distribuições.
+  - `nortest`: Para testes de normalidade.
+  - `ggplot2`: Para visualização de dados.
+
+- **Documentação do R**: [CRAN R Project](https://cran.r-project.org/)
+
+---
+
+# Dúvidas?
+
+Se houver alguma dúvida ou necessidade de aprofundamento em algum tópico específico, não hesite em perguntar! Estamos aqui para ajudar no seu aprendizado.

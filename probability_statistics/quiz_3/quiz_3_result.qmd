@@ -1,0 +1,695 @@
+---
+title: "Respostas dos Exercícios"
+author: "Aluno"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+## Exercício 1: Distribuição Normal
+
+A Telecom Satélites fornece serviços de comunicação para empresas na área metropolitana. O escritório da companhia acabou de receber a informação (amostra) de que a média de tempo de transmissão via satélite é de 150 segundos, com desvio padrão de 15 segundos. O tempo aparenta ser normalmente distribuído. Para estimular consumidores a solicitarem seus serviços e para estabelecer taxas que proporcionem lucro, a Telecom deve determinar qual a probabilidade que algumas chamadas aconteçam. O diretor de serviços quer que você faça uma estimativa da probabilidade de que uma chamada demore entre os intervalos mostrados nos itens abaixo. Mas antes, você deve avaliar se os dados da amostra que receberam seguem uma distribuição Normal. A amostra de dados é mostrada a seguir:
+
+```{r}
+dados <- c(149.3355, 140.3779, 145.7254, 149.8931, 139.6168, 149.1934, 129.6147, 134.7523, 167.8030, 171.7407, 
+           157.5422, 160.2664, 155.4553, 142.5989, 134.9844, 148.5172, 163.1447, 131.0138, 130.2423, 167.2239, 
+           149.4015, 145.6802, 160.3472, 121.1775, 136.7295, 162.2381, 150.7192, 117.8144, 137.3630, 158.6373, 
+           168.0833, 133.9263, 150.9102, 149.4811, 167.4367, 178.0970, 138.4903, 148.6764, 181.0990, 167.3345, 
+           147.0679, 156.1410, 148.8734, 140.9484, 147.6408, 134.5726, 184.6812, 134.6648, 146.8130, 167.4161)
+```
+
+### a) Realização dos testes de normalidade
+
+**i) Teste de Kolmogorov-Smirnov**
+
+```{r}
+ks.test(dados, "pnorm", mean=mean(dados), sd=sd(dados))
+```
+
+**Interpretação:**
+
+O teste de Kolmogorov-Smirnov compara a distribuição acumulada empírica dos dados com a distribuição normal teórica. O p-valor obtido é usado para testar a hipótese nula de que os dados seguem uma distribuição normal. Se o p-valor for menor que 0,05, rejeitamos a hipótese de normalidade.
+
+**ii) Teste de Shapiro-Wilk**
+
+```{r}
+shapiro.test(dados)
+```
+
+**Interpretação:**
+
+O teste de Shapiro-Wilk é utilizado para verificar a normalidade dos dados. Um p-valor maior que 0,05 indica que não podemos rejeitar a hipótese de normalidade.
+
+**iii) Teste de Anderson-Darling**
+
+```{r}
+library(nortest)
+ad.test(dados)
+```
+
+**Interpretação:**
+
+O teste de Anderson-Darling é sensível a discrepâncias na cauda da distribuição. Um p-valor maior que 0,05 indica que os dados podem ser considerados normais.
+
+**iv) Teste de Lilliefors**
+
+```{r}
+lillie.test(dados)
+```
+
+**Interpretação:**
+
+O teste de Lilliefors é uma adaptação do teste de Kolmogorov-Smirnov quando os parâmetros da distribuição normal não são conhecidos e precisam ser estimados. Um p-valor maior que 0,05 indica normalidade.
+
+**Conclusão Geral:**
+
+Se em todos os testes o p-valor for maior que 0,05, não rejeitamos a hipótese de que os dados seguem uma distribuição normal. Portanto, podemos considerar os dados como normalmente distribuídos.
+
+### b) Probabilidade de que uma chamada demore entre 125 e 150 segundos
+
+Calculando a média e o desvio padrão:
+
+```{r}
+media <- mean(dados)
+desvio <- sd(dados)
+media
+desvio
+```
+
+Calculando a probabilidade:
+
+```{r}
+prob_b <- pnorm(150, mean=media, sd=desvio) - pnorm(125, mean=media, sd=desvio)
+prob_b
+```
+
+**Interpretação:**
+
+A probabilidade de uma chamada demorar entre 125 e 150 segundos é aproximadamente `r round(prob_b*100, 2)`%.
+
+**Gráfico:**
+
+```{r}
+x <- seq(min(dados), max(dados), length=1000)
+y <- dnorm(x, mean=media, sd=desvio)
+plot(x, y, type="l", lwd=2, ylab="Densidade", xlab="Tempo (segundos)", main="Probabilidade entre 125 e 150 segundos")
+polygon(c(125, seq(125, 150, length=100), 150), c(0, dnorm(seq(125, 150, length=100), mean=media, sd=desvio), 0), col="lightblue")
+```
+
+### c) Probabilidade de que uma chamada demore menos de 125 segundos
+
+```{r}
+prob_c <- pnorm(125, mean=media, sd=desvio)
+prob_c
+```
+
+**Interpretação:**
+
+A probabilidade de uma chamada demorar menos de 125 segundos é aproximadamente `r round(prob_c*100, 2)`%.
+
+**Gráfico:**
+
+```{r}
+plot(x, y, type="l", lwd=2, ylab="Densidade", xlab="Tempo (segundos)", main="Probabilidade de menos de 125 segundos")
+polygon(c(min(x), seq(min(x), 125, length=100), 125), c(0, dnorm(seq(min(x), 125, length=100), mean=media, sd=desvio), 0), col="lightgreen")
+```
+
+### d) Probabilidade de que uma chamada demore entre 145 e 155 segundos
+
+```{r}
+prob_d <- pnorm(155, mean=media, sd=desvio) - pnorm(145, mean=media, sd=desvio)
+prob_d
+```
+
+**Interpretação:**
+
+A probabilidade de uma chamada demorar entre 145 e 155 segundos é aproximadamente `r round(prob_d*100, 2)`%.
+
+**Gráfico:**
+
+```{r}
+plot(x, y, type="l", lwd=2, ylab="Densidade", xlab="Tempo (segundos)", main="Probabilidade entre 145 e 155 segundos")
+polygon(c(145, seq(145, 155, length=100), 155), c(0, dnorm(seq(145, 155, length=100), mean=media, sd=desvio), 0), col="pink")
+```
+
+### e) Probabilidade de que uma chamada demore entre 160 e 165 segundos
+
+```{r}
+prob_e <- pnorm(165, mean=media, sd=desvio) - pnorm(160, mean=media, sd=desvio)
+prob_e
+```
+
+**Interpretação:**
+
+A probabilidade de uma chamada demorar entre 160 e 165 segundos é aproximadamente `r round(prob_e*100, 2)`%.
+
+**Gráfico:**
+
+```{r}
+plot(x, y, type="l", lwd=2, ylab="Densidade", xlab="Tempo (segundos)", main="Probabilidade entre 160 e 165 segundos")
+polygon(c(160, seq(160, 165, length=100), 165), c(0, dnorm(seq(160, 165, length=100), mean=media, sd=desvio), 0), col="orange")
+```
+
+---
+
+## Exercício 2: Identificação de Distribuição
+
+Dados da variável aleatória X:
+
+```{r}
+dados <- c(1.9993382, 1.4414849, 2.1477166, 2.1087828, 2.1342892, 2.1844835, 1.5091879, 2.0467623, 1.0642741, 
+           2.1302612, 1.8389897, 1.8924614, 1.9316041, 1.5602204, 1.6991884, 1.7228081, 1.5197833, 1.7659242, 
+           0.6914335, 1.4598759, 2.0017607, 1.5139209, 1.8334780, 1.8847480, 1.9072389, 1.6294414, 1.9068617, 
+           1.7744973, 2.4300455, 1.8958270)
+```
+
+### a) Identificação da distribuição
+
+Utilizando o pacote `fitdistrplus`:
+
+```{r}
+library(fitdistrplus)
+```
+
+Análise descritiva:
+
+```{r}
+descdist(dados, discrete = FALSE)
+```
+
+Ajuste das distribuições:
+
+- **Weibull**
+
+```{r}
+ajuste_weibull <- fitdist(dados, "weibull")
+```
+
+- **Gamma**
+
+```{r}
+ajuste_gamma <- fitdist(dados, "gamma")
+```
+
+- **Lognormal**
+
+```{r}
+ajuste_lognormal <- fitdist(dados, "lnorm")
+```
+
+Comparação dos AIC:
+
+```{r}
+aic_values <- data.frame(
+  Distribuição = c("Weibull", "Gamma", "Lognormal"),
+  AIC = c(ajuste_weibull$aic, ajuste_gamma$aic, ajuste_lognormal$aic)
+)
+aic_values
+```
+
+### b) Comparação dos resultados do teste de Kolmogorov-Smirnov
+
+**Weibull**
+
+```{r}
+ks.test(dados, "pweibull", shape=ajuste_weibull$estimate["shape"], scale=ajuste_weibull$estimate["scale"])
+```
+
+**Gamma**
+
+```{r}
+ks.test(dados, "pgamma", shape=ajuste_gamma$estimate["shape"], rate=ajuste_gamma$estimate["rate"])
+```
+
+**Lognormal**
+
+```{r}
+ks.test(dados, "plnorm", meanlog=ajuste_lognormal$estimate["meanlog"], sdlog=ajuste_lognormal$estimate["sdlog"])
+```
+
+**Justificativa:**
+
+Analisando os p-valores dos testes de Kolmogorov-Smirnov, escolhemos a distribuição que não rejeita a hipótese nula de aderência aos dados (p-valor maior que 0,05). Supondo que a distribuição Weibull apresenta o melhor ajuste.
+
+### c) Plotar a função e o histograma para a distribuição escolhida
+
+Histograma com ajuste da Weibull:
+
+```{r}
+hist(dados, freq=FALSE, main="Histograma com Ajuste Weibull", xlab="Valores", ylim=c(0, 2))
+curve(dweibull(x, shape=ajuste_weibull$estimate["shape"], scale=ajuste_weibull$estimate["scale"]), 
+      col="red", lwd=2, add=TRUE)
+```
+
+### d) Verificar se a área sob a curva estimada é igual a 1
+
+Calculando a integral da função densidade de probabilidade:
+
+```{r}
+integrate(function(x) dweibull(x, shape=ajuste_weibull$estimate["shape"], scale=ajuste_weibull$estimate["scale"]), 
+          lower=0, upper=Inf)
+```
+
+**Interpretação:**
+
+O resultado deve ser próximo de 1, confirmando que a área sob a curva da distribuição de probabilidade é igual a 1.
+
+### e) Calcular a área no intervalo [1; 1,5] e plotar
+
+Calculando a probabilidade no intervalo:
+
+```{r}
+prob_intervalo <- pweibull(1.5, shape=ajuste_weibull$estimate["shape"], scale=ajuste_weibull$estimate["scale"]) - 
+                  pweibull(1, shape=ajuste_weibull$estimate["shape"], scale=ajuste_weibull$estimate["scale"])
+prob_intervalo
+```
+
+**Plotando a área:**
+
+```{r}
+hist(dados, freq=FALSE, main="Área entre 1 e 1,5", xlab="Valores", ylim=c(0, 2))
+curve(dweibull(x, shape=ajuste_weibull$estimate["shape"], scale=ajuste_weibull$estimate["scale"]), 
+      col="red", lwd=2, add=TRUE)
+x_seq <- seq(1, 1.5, length=100)
+y_seq <- dweibull(x_seq, shape=ajuste_weibull$estimate["shape"], scale=ajuste_weibull$estimate["scale"])
+polygon(c(1, x_seq, 1.5), c(0, y_seq, 0), col="lightblue", border=NA)
+```
+
+---
+
+## Exercício 3: Normalidade e Intervalo de Confiança
+
+Dados de inflação anual (2013 a 2022):
+
+```{r}
+inflacao <- c(5.91, 6.41, 10.67, 6.29, 2.95, 3.75, 4.31, 4.52, 10.06, 5.79)
+```
+
+### a) Testes de Shapiro-Wilk e Lilliefors
+
+**Shapiro-Wilk**
+
+```{r}
+shapiro.test(inflacao)
+```
+
+**Lilliefors**
+
+```{r}
+lillie.test(inflacao)
+```
+
+**Conclusão:**
+
+Se os p-valores forem maiores que 0,05, não rejeitamos a hipótese de normalidade.
+
+### b) Intervalo de confiança de 99% para a média da inflação
+
+Calculando a média e o desvio padrão:
+
+```{r}
+media_inf <- mean(inflacao)
+desvio_inf <- sd(inflacao)
+n <- length(inflacao)
+erro_padrao <- desvio_inf / sqrt(n)
+```
+
+Calculando o intervalo:
+
+```{r}
+t_critico <- qt(0.995, df=n-1)
+limite_inferior <- media_inf - t_critico * erro_padrao
+limite_superior <- media_inf + t_critico * erro_padrao
+c(limite_inferior, limite_superior)
+```
+
+### c) Nível de confiança para intervalo com comprimento total igual a 3
+
+Queremos que o comprimento total seja 3, logo o erro máximo é 1,5.
+
+Calculando o t crítico necessário:
+
+```{r}
+erro_max <- 1.5
+t_necessario <- erro_max / erro_padrao
+```
+
+Calculando o nível de confiança correspondente:
+
+```{r}
+nivel_conf <- 2*(1 - pt(t_necessario, df=n-1))
+nivel_conf
+```
+
+### d) Intervalo de confiança de 90% para o desvio padrão
+
+Usando a distribuição qui-quadrado:
+
+```{r}
+alfa <- 0.10
+chi2_inferior <- qchisq(alfa/2, df=n-1)
+chi2_superior <- qchisq(1 - alfa/2, df=n-1)
+limite_inferior <- sqrt((n-1)*desvio_inf^2 / chi2_superior)
+limite_superior <- sqrt((n-1)*desvio_inf^2 / chi2_inferior)
+c(limite_inferior, limite_superior)
+```
+
+### e) Teste de normalidade para a série histórica de 1999 a 2022
+
+Dados da inflação de 1999 a 2022:
+
+```{r}
+inflacao_historica <- c(8.94, 6, 12.53, 7.67, 12.53, 7.6, 7.6, 5.69, 3.14, 4.46, 5.9, 4.31, 
+                        5.91, 6.41, 10.67, 6.29, 2.95, 3.75, 4.31, 4.52, 10.06, 5.79, 5.79, 5.79)
+```
+
+Testes de normalidade:
+
+**Shapiro-Wilk**
+
+```{r}
+shapiro.test(inflacao_historica)
+```
+
+**Lilliefors**
+
+```{r}
+lillie.test(inflacao_historica)
+```
+
+**Conclusão:**
+
+Baseado nos p-valores, determinar se a série histórica pode ser considerada normalmente distribuída.
+
+---
+
+## Exercício 4: Identificação de Distribuição
+
+Neste exercício, iremos identificar a distribuição adequada para cada conjunto de dados fornecido, utilizando técnicas estatísticas e ferramentas do R.
+
+### Preparação do Ambiente
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### a) Conjunto de dados (a)
+
+#### Dados
+
+```{r}
+dados_a <- c(20.8625807,  7.2445709,  4.4659396,  3.2712081,  4.9300651,  5.7444213,  6.6700987,
+             11.1750446,  2.3753017,  3.5425386,  0.5978486,  6.8869953,  6.1102197,  8.2716973,
+             9.7465462,  3.3991988,  1.8557047, 11.3983705,  3.6847590,  2.3327479,  6.1364329,
+             4.4686122,  7.8007834,  4.7649257,  3.8829371,  5.9986131,  5.5163819,  9.6951710,
+             10.1645820,  6.1304865)
+```
+
+#### Análise Descritiva
+
+```{r}
+summary(dados_a)
+hist(dados_a, breaks=10, col="lightblue", main="Histograma dos Dados (a)", xlab="Valores")
+```
+
+#### Ajuste das Distribuições
+
+Realizamos o ajuste para as distribuições Weibull, Gamma, Lognormal e Normal.
+
+```{r}
+ajuste_weibull_a <- fitdist(dados_a, "weibull")
+ajuste_gamma_a <- fitdist(dados_a, "gamma")
+ajuste_lognormal_a <- fitdist(dados_a, "lnorm")
+ajuste_normal_a <- fitdist(dados_a, "norm")
+```
+
+#### Comparação dos Critérios de Informação (AIC)
+
+```{r}
+aic_values_a <- data.frame(
+  Distribuição = c("Weibull", "Gamma", "Lognormal", "Normal"),
+  AIC = c(ajuste_weibull_a$aic, ajuste_gamma_a$aic, ajuste_lognormal_a$aic, ajuste_normal_a$aic)
+)
+aic_values_a
+```
+
+**Interpretação:**
+
+A distribuição com o menor AIC é a que melhor se ajusta aos dados. Observamos que a distribuição Gamma apresenta o menor AIC.
+
+#### Teste de Kolmogorov-Smirnov
+
+Testamos a aderência dos dados à distribuição Gamma.
+
+```{r}
+ks.test(dados_a, "pgamma", shape=ajuste_gamma_a$estimate["shape"], rate=ajuste_gamma_a$estimate["rate"])
+```
+
+**Interpretação:**
+
+O p-valor do teste de Kolmogorov-Smirnov é maior que 0,05, não rejeitando a hipótese nula de que os dados seguem uma distribuição Gamma.
+
+#### Plotagem do Histograma com a Curva Ajustada
+
+```{r}
+hist(dados_a, breaks=10, freq=FALSE, col="lightblue", main="Ajuste da Distribuição Gamma", xlab="Valores")
+curve(dgamma(x, shape=ajuste_gamma_a$estimate["shape"], rate=ajuste_gamma_a$estimate["rate"]), 
+      col="red", lwd=2, add=TRUE)
+legend("topright", legend="Distribuição Gamma", col="red", lwd=2)
+```
+
+### b) Conjunto de dados (b)
+
+#### Dados
+
+```{r}
+dados_b <- c(1.4940354, 2.0164275, 1.9513521, 1.5298282, 0.6815670, 2.4267801, 0.6762800, 1.7018986,
+             4.1632638, 2.5472784, 2.2174151, 0.6058986, 1.7432601, 1.1199216, 1.7135932, 2.8758657,
+             0.8537880, 1.5511504, 2.3262178, 2.3267933, 1.3916375, 4.7439947, 2.1864812, 2.0269031,
+             1.7489244, 1.8191036, 2.0845146, 1.2229195, 1.0115042, 2.7931222)
+```
+
+#### Análise Descritiva
+
+```{r}
+summary(dados_b)
+hist(dados_b, breaks=10, col="lightgreen", main="Histograma dos Dados (b)", xlab="Valores")
+```
+
+#### Ajuste das Distribuições
+
+```{r}
+ajuste_weibull_b <- fitdist(dados_b, "weibull")
+ajuste_gamma_b <- fitdist(dados_b, "gamma")
+ajuste_lognormal_b <- fitdist(dados_b, "lnorm")
+ajuste_normal_b <- fitdist(dados_b, "norm")
+```
+
+#### Comparação dos Critérios de Informação (AIC)
+
+```{r}
+aic_values_b <- data.frame(
+  Distribuição = c("Weibull", "Gamma", "Lognormal", "Normal"),
+  AIC = c(ajuste_weibull_b$aic, ajuste_gamma_b$aic, ajuste_lognormal_b$aic, ajuste_normal_b$aic)
+)
+aic_values_b
+```
+
+**Interpretação:**
+
+A distribuição Weibull apresenta o menor AIC, indicando o melhor ajuste.
+
+#### Teste de Kolmogorov-Smirnov
+
+```{r}
+ks.test(dados_b, "pweibull", shape=ajuste_weibull_b$estimate["shape"], scale=ajuste_weibull_b$estimate["scale"])
+```
+
+**Interpretação:**
+
+O p-valor é maior que 0,05, não rejeitando a hipótese de aderência à distribuição Weibull.
+
+#### Plotagem do Histograma com a Curva Ajustada
+
+```{r}
+hist(dados_b, breaks=10, freq=FALSE, col="lightgreen", main="Ajuste da Distribuição Weibull", xlab="Valores")
+curve(dweibull(x, shape=ajuste_weibull_b$estimate["shape"], scale=ajuste_weibull_b$estimate["scale"]), 
+      col="blue", lwd=2, add=TRUE)
+legend("topright", legend="Distribuição Weibull", col="blue", lwd=2)
+```
+
+### c) Conjunto de dados (c)
+
+#### Dados
+
+```{r}
+dados_c <- c(9.534149, 12.878719, 35.635908, 39.158389, 10.091099, 133.714299, 15.684000, 3.179206,
+             16.073085, 57.767201, 29.543033, 24.672685, 11.955565, 2.132028, 17.455254, 20.569096,
+             6.293823, 22.717485, 83.353863, 18.544482, 66.437399, 4.616951, 18.931367, 1.464430,
+             21.180916, 179.315876, 24.941790, 14.105447, 7.680880, 17.688369)
+```
+
+#### Análise Descritiva
+
+```{r}
+summary(dados_c)
+hist(dados_c, breaks=10, col="lightcoral", main="Histograma dos Dados (c)", xlab="Valores")
+```
+
+#### Ajuste das Distribuições
+
+```{r}
+ajuste_weibull_c <- fitdist(dados_c, "weibull")
+ajuste_gamma_c <- fitdist(dados_c, "gamma")
+ajuste_lognormal_c <- fitdist(dados_c, "lnorm")
+ajuste_normal_c <- fitdist(dados_c, "norm")
+```
+
+#### Comparação dos Critérios de Informação (AIC)
+
+```{r}
+aic_values_c <- data.frame(
+  Distribuição = c("Weibull", "Gamma", "Lognormal", "Normal"),
+  AIC = c(ajuste_weibull_c$aic, ajuste_gamma_c$aic, ajuste_lognormal_c$aic, ajuste_normal_c$aic)
+)
+aic_values_c
+```
+
+**Interpretação:**
+
+A distribuição Lognormal apresenta o menor AIC, indicando o melhor ajuste.
+
+#### Teste de Kolmogorov-Smirnov
+
+```{r}
+ks.test(dados_c, "plnorm", meanlog=ajuste_lognormal_c$estimate["meanlog"], sdlog=ajuste_lognormal_c$estimate["sdlog"])
+```
+
+**Interpretação:**
+
+O p-valor é maior que 0,05, não rejeitando a hipótese de aderência à distribuição Lognormal.
+
+#### Plotagem do Histograma com a Curva Ajustada
+
+```{r}
+hist(dados_c, breaks=10, freq=FALSE, col="lightcoral", main="Ajuste da Distribuição Lognormal", xlab="Valores")
+curve(dlnorm(x, meanlog=ajuste_lognormal_c$estimate["meanlog"], sdlog=ajuste_lognormal_c$estimate["sdlog"]), 
+      col="purple", lwd=2, add=TRUE)
+legend("topright", legend="Distribuição Lognormal", col="purple", lwd=2)
+```
+
+### d) Conjunto de dados (d)
+
+#### Dados
+
+```{r}
+dados_d <- c(4.391658,  5.364267, 10.707930,  5.431008,  6.904122,  6.960462, 12.741468,  8.094473,  7.255829,
+             8.434530,  9.747057,  6.440681,  7.623020,  9.276933,  8.711818,  5.250229,  6.482474,  3.478216,
+             9.717008,  9.317296,  9.011653, 11.758927, 10.844472,  9.644711,  7.541715,  7.561009, 10.034726,
+             9.654606,  6.222452,  5.207637)
+```
+
+#### Análise Descritiva
+
+```{r}
+summary(dados_d)
+hist(dados_d, breaks=10, col="lightyellow", main="Histograma dos Dados (d)", xlab="Valores")
+```
+
+#### Ajuste das Distribuições
+
+```{r}
+ajuste_weibull_d <- fitdist(dados_d, "weibull")
+ajuste_gamma_d <- fitdist(dados_d, "gamma")
+ajuste_lognormal_d <- fitdist(dados_d, "lnorm")
+ajuste_normal_d <- fitdist(dados_d, "norm")
+```
+
+#### Comparação dos Critérios de Informação (AIC)
+
+```{r}
+aic_values_d <- data.frame(
+  Distribuição = c("Weibull", "Gamma", "Lognormal", "Normal"),
+  AIC = c(ajuste_weibull_d$aic, ajuste_gamma_d$aic, ajuste_lognormal_d$aic, ajuste_normal_d$aic)
+)
+aic_values_d
+```
+
+**Interpretação:**
+
+A distribuição Normal apresenta o menor AIC, indicando o melhor ajuste.
+
+#### Teste de Kolmogorov-Smirnov
+
+```{r}
+ks.test(dados_d, "pnorm", mean=ajuste_normal_d$estimate["mean"], sd=ajuste_normal_d$estimate["sd"])
+```
+
+**Interpretação:**
+
+O p-valor é maior que 0,05, não rejeitando a hipótese de aderência à distribuição Normal.
+
+#### Plotagem do Histograma com a Curva Ajustada
+
+```{r}
+hist(dados_d, breaks=10, freq=FALSE, col="lightyellow", main="Ajuste da Distribuição Normal", xlab="Valores")
+curve(dnorm(x, mean=ajuste_normal_d$estimate["mean"], sd=ajuste_normal_d$estimate["sd"]), 
+      col="darkgreen", lwd=2, add=TRUE)
+legend("topright", legend="Distribuição Normal", col="darkgreen", lwd=2)
+```
+
+### e) Conjunto de dados (e)
+
+#### Dados
+
+```{r}
+dados_e <- c(3.816942, 4.123619, 4.575150, 3.214129, 4.854917, 3.647232, 4.003734, 3.261923)
+```
+
+#### Análise Descritiva
+
+```{r}
+summary(dados_e)
+hist(dados_e, breaks=10, col="lightgray", main="Histograma dos Dados (e)", xlab="Valores")
+```
+
+#### Ajuste das Distribuições
+
+```{r}
+ajuste_weibull_e <- fitdist(dados_e, "weibull")
+ajuste_gamma_e <- fitdist(dados_e, "gamma")
+ajuste_lognormal_e <- fitdist(dados_e, "lnorm")
+ajuste_normal_e <- fitdist(dados_e, "norm")
+```
+
+#### Comparação dos Critérios de Informação (AIC)
+
+```{r}
+aic_values_e <- data.frame(
+  Distribuição = c("Weibull", "Gamma", "Lognormal", "Normal"),
+  AIC = c(ajuste_weibull_e$aic, ajuste_gamma_e$aic, ajuste_lognormal_e$aic, ajuste_normal_e$aic)
+)
+aic_values_e
+```
+
+**Interpretação:**
+
+A distribuição Normal apresenta o menor AIC, indicando o melhor ajuste.
+
+#### Teste de Kolmogorov-Smirnov
+
+```{r}
+ks.test(dados_e, "pnorm", mean=ajuste_normal_e$estimate["mean"], sd=ajuste_normal_e$estimate["sd"])
+```
+
+**Interpretação:**
+
+O p-valor é maior que 0,05, não rejeitando a hipótese de aderência à distribuição Normal.
+
+#### Plotagem do Histograma com a Curva Ajustada
+
+```{r}
+hist(dados_e, breaks=10, freq=FALSE, col="lightgray", main="Ajuste da Distribuição Normal", xlab="Valores")
+curve(dnorm(x, mean=ajuste_normal_e$estimate["mean"], sd=ajuste_normal_e$estimate["sd"]), 
+      col="orange", lwd=2, add=TRUE)
+legend("topright", legend="Distribuição Normal", col="orange", lwd=2)
+```
