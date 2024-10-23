@@ -1,13 +1,34 @@
 ---
-title: "Respostas dos Exercícios"
-author: "Aluno"
-date: "`r Sys.Date()`"
-output: html_document
+Encoding: UTF-8 Unicode
+lang: pt  
+title: "CEDS (2024): Probabilidade e Estatística"
+subtitle: "QUIZ 3" 
+author: "Rennan Dalla Guimarães"
+date: 2024-10-22
+format:
+  html:
+    theme: cosmo
+    toc: true
+  pdf:
+    toc: true
+    number-sections: true
+execute:
+  echo: true
+  eval: true
+  warning: false
+editor: 
+  markdown: 
+    wrap: 72
 ---
 
-## Exercício 1: Distribuição Normal
+## Introdução
 
-A Telecom Satélites fornece serviços de comunicação para empresas na área metropolitana. O escritório da companhia acabou de receber a informação (amostra) de que a média de tempo de transmissão via satélite é de 150 segundos, com desvio padrão de 15 segundos. O tempo aparenta ser normalmente distribuído. Para estimular consumidores a solicitarem seus serviços e para estabelecer taxas que proporcionem lucro, a Telecom deve determinar qual a probabilidade que algumas chamadas aconteçam. O diretor de serviços quer que você faça uma estimativa da probabilidade de que uma chamada demore entre os intervalos mostrados nos itens abaixo. Mas antes, você deve avaliar se os dados da amostra que receberam seguem uma distribuição Normal. A amostra de dados é mostrada a seguir:
+O objetivo desse projeto é realizar o quiz 3, que busca colocar em prática aprendizados sobre: Distribuição normal, identificação de distribuições, 
+normalidade e intervalo de confiança.
+
+No [repositótio do projeto](https://github.com/rennan-guimaraes/ceds/tree/main/probability_statistics/quiz_3) temos a versão em html e qmd, caso esteja com dificuldade de ler alguma parte do arquivo.
+
+## Exercício 1: Distribuição Normal
 
 ```{r}
 dados <- c(149.3355, 140.3779, 145.7254, 149.8931, 139.6168, 149.1934, 129.6147, 134.7523, 167.8030, 171.7407, 
@@ -27,7 +48,11 @@ ks.test(dados, "pnorm", mean=mean(dados), sd=sd(dados))
 
 **Interpretação:**
 
-O teste de Kolmogorov-Smirnov compara a distribuição acumulada empírica dos dados com a distribuição normal teórica. O p-valor obtido é usado para testar a hipótese nula de que os dados seguem uma distribuição normal. Se o p-valor for menor que 0,05, rejeitamos a hipótese de normalidade.
+O teste de Kolmogorov-Smirnov compara a distribuição acumulada empírica
+dos dados com a distribuição normal teórica. O p-valor obtido é usado
+para testar a hipótese nula de que os dados seguem uma distribuição
+normal. Se o p-valor for menor que 0,05, rejeitamos a hipótese de
+normalidade.
 
 **ii) Teste de Shapiro-Wilk**
 
@@ -37,7 +62,9 @@ shapiro.test(dados)
 
 **Interpretação:**
 
-O teste de Shapiro-Wilk é utilizado para verificar a normalidade dos dados. Um p-valor maior que 0,05 indica que não podemos rejeitar a hipótese de normalidade.
+O teste de Shapiro-Wilk é utilizado para verificar a normalidade dos
+dados. Um p-valor maior que 0,05 indica que não podemos rejeitar a
+hipótese de normalidade.
 
 **iii) Teste de Anderson-Darling**
 
@@ -48,7 +75,9 @@ ad.test(dados)
 
 **Interpretação:**
 
-O teste de Anderson-Darling é sensível a discrepâncias na cauda da distribuição. Um p-valor maior que 0,05 indica que os dados podem ser considerados normais.
+O teste de Anderson-Darling é sensível a discrepâncias na cauda da
+distribuição. Um p-valor maior que 0,05 indica que os dados podem ser
+considerados normais.
 
 **iv) Teste de Lilliefors**
 
@@ -58,11 +87,15 @@ lillie.test(dados)
 
 **Interpretação:**
 
-O teste de Lilliefors é uma adaptação do teste de Kolmogorov-Smirnov quando os parâmetros da distribuição normal não são conhecidos e precisam ser estimados. Um p-valor maior que 0,05 indica normalidade.
+O teste de Lilliefors é uma adaptação do teste de Kolmogorov-Smirnov
+quando os parâmetros da distribuição normal não são conhecidos e
+precisam ser estimados. Um p-valor maior que 0,05 indica normalidade.
 
 **Conclusão Geral:**
 
-Se em todos os testes o p-valor for maior que 0,05, não rejeitamos a hipótese de que os dados seguem uma distribuição normal. Portanto, podemos considerar os dados como normalmente distribuídos.
+Se em todos os testes o p-valor for maior que 0,05, não rejeitamos a
+hipótese de que os dados seguem uma distribuição normal. Portanto,
+podemos considerar os dados como normalmente distribuídos.
 
 ### b) Probabilidade de que uma chamada demore entre 125 e 150 segundos
 
@@ -84,7 +117,8 @@ prob_b
 
 **Interpretação:**
 
-A probabilidade de uma chamada demorar entre 125 e 150 segundos é aproximadamente `r round(prob_b*100, 2)`%.
+A probabilidade de uma chamada demorar entre 125 e 150 segundos é
+aproximadamente `r round(prob_b*100, 2)`%.
 
 **Gráfico:**
 
@@ -104,7 +138,8 @@ prob_c
 
 **Interpretação:**
 
-A probabilidade de uma chamada demorar menos de 125 segundos é aproximadamente `r round(prob_c*100, 2)`%.
+A probabilidade de uma chamada demorar menos de 125 segundos é
+aproximadamente `r round(prob_c*100, 2)`%.
 
 **Gráfico:**
 
@@ -122,7 +157,8 @@ prob_d
 
 **Interpretação:**
 
-A probabilidade de uma chamada demorar entre 145 e 155 segundos é aproximadamente `r round(prob_d*100, 2)`%.
+A probabilidade de uma chamada demorar entre 145 e 155 segundos é
+aproximadamente `r round(prob_d*100, 2)`%.
 
 **Gráfico:**
 
@@ -140,7 +176,8 @@ prob_e
 
 **Interpretação:**
 
-A probabilidade de uma chamada demorar entre 160 e 165 segundos é aproximadamente `r round(prob_e*100, 2)`%.
+A probabilidade de uma chamada demorar entre 160 e 165 segundos é
+aproximadamente `r round(prob_e*100, 2)`%.
 
 **Gráfico:**
 
@@ -149,7 +186,7 @@ plot(x, y, type="l", lwd=2, ylab="Densidade", xlab="Tempo (segundos)", main="Pro
 polygon(c(160, seq(160, 165, length=100), 165), c(0, dnorm(seq(160, 165, length=100), mean=media, sd=desvio), 0), col="orange")
 ```
 
----
+------------------------------------------------------------------------
 
 ## Exercício 2: Identificação de Distribuição
 
@@ -178,19 +215,19 @@ descdist(dados, discrete = FALSE)
 
 Ajuste das distribuições:
 
-- **Weibull**
+-   **Weibull**
 
 ```{r}
 ajuste_weibull <- fitdist(dados, "weibull")
 ```
 
-- **Gamma**
+-   **Gamma**
 
 ```{r}
 ajuste_gamma <- fitdist(dados, "gamma")
 ```
 
-- **Lognormal**
+-   **Lognormal**
 
 ```{r}
 ajuste_lognormal <- fitdist(dados, "lnorm")
@@ -228,7 +265,26 @@ ks.test(dados, "plnorm", meanlog=ajuste_lognormal$estimate["meanlog"], sdlog=aju
 
 **Justificativa:**
 
-Analisando os p-valores dos testes de Kolmogorov-Smirnov, escolhemos a distribuição que não rejeita a hipótese nula de aderência aos dados (p-valor maior que 0,05). Supondo que a distribuição Weibull apresenta o melhor ajuste.
+Analisando os resultados apresentados, a distribuição Weibull apresenta
+o melhor ajuste aos dados por duas razões principais:
+
+Menor valor de AIC (Critério de Informação de Akaike):
+
+Weibull: 21.97718 Gamma: 31.70738 Lognormal: 36.10330
+
+O AIC mais baixo da Weibull indica que esta distribuição oferece o
+melhor compromisso entre a qualidade do ajuste e a complexidade do
+modelo.
+
+Maior p-valor no teste de Kolmogorov-Smirnov: Weibull: p-valor = 0.9424
+Gamma: p-valor = 0.5332 Lognormal: p-valor = 0.423
+
+O p-valor mais alto da Weibull (0.9424) indica que não há evidências
+para rejeitar a hipótese de que os dados seguem esta distribuição.
+Quanto maior o p-valor, mais forte é a evidência de que o modelo se
+ajusta bem aos dados. Em comparação com as outras distribuições, a
+Weibull apresenta tanto o menor AIC quanto o maior p-valor, o que a
+torna claramente a melhor escolha para modelar estes dados.
 
 ### c) Plotar a função e o histograma para a distribuição escolhida
 
@@ -251,9 +307,10 @@ integrate(function(x) dweibull(x, shape=ajuste_weibull$estimate["shape"], scale=
 
 **Interpretação:**
 
-O resultado deve ser próximo de 1, confirmando que a área sob a curva da distribuição de probabilidade é igual a 1.
+O resultado deve ser próximo de 1, confirmando que a área sob a curva da
+distribuição de probabilidade é igual a 1.
 
-### e) Calcular a área no intervalo [1; 1,5] e plotar
+### e) Calcular a área no intervalo \[1; 1,5\] e plotar
 
 Calculando a probabilidade no intervalo:
 
@@ -274,7 +331,7 @@ y_seq <- dweibull(x_seq, shape=ajuste_weibull$estimate["shape"], scale=ajuste_we
 polygon(c(1, x_seq, 1.5), c(0, y_seq, 0), col="lightblue", border=NA)
 ```
 
----
+------------------------------------------------------------------------
 
 ## Exercício 3: Normalidade e Intervalo de Confiança
 
@@ -300,7 +357,8 @@ lillie.test(inflacao)
 
 **Conclusão:**
 
-Se os p-valores forem maiores que 0,05, não rejeitamos a hipótese de normalidade.
+Se os p-valores forem maiores que 0,05, não rejeitamos a hipótese de
+normalidade.
 
 ### b) Intervalo de confiança de 99% para a média da inflação
 
@@ -378,13 +436,16 @@ lillie.test(inflacao_historica)
 
 **Conclusão:**
 
-Baseado nos p-valores, determinar se a série histórica pode ser considerada normalmente distribuída.
+Baseado nos p-valores, determinar se a série histórica pode ser
+considerada normalmente distribuída.
 
----
+------------------------------------------------------------------------
 
 ## Exercício 4: Identificação de Distribuição
 
-Neste exercício, iremos identificar a distribuição adequada para cada conjunto de dados fornecido, utilizando técnicas estatísticas e ferramentas do R.
+Neste exercício, iremos identificar a distribuição adequada para cada
+conjunto de dados fornecido, utilizando técnicas estatísticas e
+ferramentas do R.
 
 ### Preparação do Ambiente
 
@@ -413,7 +474,8 @@ hist(dados_a, breaks=10, col="lightblue", main="Histograma dos Dados (a)", xlab=
 
 #### Ajuste das Distribuições
 
-Realizamos o ajuste para as distribuições Weibull, Gamma, Lognormal e Normal.
+Realizamos o ajuste para as distribuições Weibull, Gamma, Lognormal e
+Normal.
 
 ```{r}
 ajuste_weibull_a <- fitdist(dados_a, "weibull")
@@ -434,7 +496,8 @@ aic_values_a
 
 **Interpretação:**
 
-A distribuição com o menor AIC é a que melhor se ajusta aos dados. Observamos que a distribuição Gamma apresenta o menor AIC.
+A distribuição com o menor AIC é a que melhor se ajusta aos dados.
+Observamos que a distribuição Gamma apresenta o menor AIC.
 
 #### Teste de Kolmogorov-Smirnov
 
@@ -446,7 +509,9 @@ ks.test(dados_a, "pgamma", shape=ajuste_gamma_a$estimate["shape"], rate=ajuste_g
 
 **Interpretação:**
 
-O p-valor do teste de Kolmogorov-Smirnov é maior que 0,05, não rejeitando a hipótese nula de que os dados seguem uma distribuição Gamma.
+O p-valor do teste de Kolmogorov-Smirnov é maior que 0,05, não
+rejeitando a hipótese nula de que os dados seguem uma distribuição
+Gamma.
 
 #### Plotagem do Histograma com a Curva Ajustada
 
@@ -496,25 +561,33 @@ aic_values_b
 
 **Interpretação:**
 
-A distribuição Weibull apresenta o menor AIC, indicando o melhor ajuste.
+A distribuição Gamma apresenta o menor AIC (77.32663), indicando o
+melhor ajuste aos dados.
 
 #### Teste de Kolmogorov-Smirnov
 
 ```{r}
-ks.test(dados_b, "pweibull", shape=ajuste_weibull_b$estimate["shape"], scale=ajuste_weibull_b$estimate["scale"])
+ks.test(dados_b, "pgamma", shape=ajuste_gamma_b$estimate["shape"], rate=ajuste_gamma_b$estimate["rate"])
 ```
 
 **Interpretação:**
 
-O p-valor é maior que 0,05, não rejeitando a hipótese de aderência à distribuição Weibull.
+• O p-valor é maior que 0,05, não rejeitando a hipótese de que os dados
+seguem uma distribuição Gamma.
+
+• Portanto, para o conjunto de dados (b), a distribuição Gamma é a que
+melhor se ajusta.
 
 #### Plotagem do Histograma com a Curva Ajustada
 
 ```{r}
-hist(dados_b, breaks=10, freq=FALSE, col="lightgreen", main="Ajuste da Distribuição Weibull", xlab="Valores")
-curve(dweibull(x, shape=ajuste_weibull_b$estimate["shape"], scale=ajuste_weibull_b$estimate["scale"]), 
-      col="blue", lwd=2, add=TRUE)
-legend("topright", legend="Distribuição Weibull", col="blue", lwd=2)
+hist(dados_b, breaks=10, freq=FALSE, col="lightgreen", main="Ajuste da Distribuição Gamma", xlab="Valores")
+
+curve(dgamma(x, shape=ajuste_gamma_b$estimate["shape"], rate=ajuste_gamma_b$estimate["rate"]),
+
+      col="red", lwd=2, add=TRUE)
+
+legend("topright", legend="Distribuição Gamma", col="red", lwd=2)
 ```
 
 ### c) Conjunto de dados (c)
@@ -556,7 +629,8 @@ aic_values_c
 
 **Interpretação:**
 
-A distribuição Lognormal apresenta o menor AIC, indicando o melhor ajuste.
+A distribuição Lognormal apresenta o menor AIC, indicando o melhor
+ajuste.
 
 #### Teste de Kolmogorov-Smirnov
 
@@ -566,7 +640,8 @@ ks.test(dados_c, "plnorm", meanlog=ajuste_lognormal_c$estimate["meanlog"], sdlog
 
 **Interpretação:**
 
-O p-valor é maior que 0,05, não rejeitando a hipótese de aderência à distribuição Lognormal.
+O p-valor é maior que 0,05, não rejeitando a hipótese de aderência à
+distribuição Lognormal.
 
 #### Plotagem do Histograma com a Curva Ajustada
 
@@ -616,25 +691,33 @@ aic_values_d
 
 **Interpretação:**
 
-A distribuição Normal apresenta o menor AIC, indicando o melhor ajuste.
+A distribuição Weibull apresenta o menor AIC (136.37110), indicando o
+melhor ajuste aos dados.
 
-#### Teste de Kolmogorov-Smirnov
+#### Teste de Kolmogorov-Smirnov para a Distribuição Weibull
 
 ```{r}
-ks.test(dados_d, "pnorm", mean=ajuste_normal_d$estimate["mean"], sd=ajuste_normal_d$estimate["sd"])
+ks.test(dados_d, "pweibull", shape=ajuste_weibull_d$estimate["shape"], scale=ajuste_weibull_d$estimate["scale"])
 ```
 
 **Interpretação:**
 
-O p-valor é maior que 0,05, não rejeitando a hipótese de aderência à distribuição Normal.
+• O p-valor é maior que 0,05, não rejeitando a hipótese de que os dados
+seguem uma distribuição Weibull.
+
+• Portanto, para o conjunto de dados (d), a distribuição Weibull é a que
+melhor se ajusta.
 
 #### Plotagem do Histograma com a Curva Ajustada
 
 ```{r}
-hist(dados_d, breaks=10, freq=FALSE, col="lightyellow", main="Ajuste da Distribuição Normal", xlab="Valores")
-curve(dnorm(x, mean=ajuste_normal_d$estimate["mean"], sd=ajuste_normal_d$estimate["sd"]), 
-      col="darkgreen", lwd=2, add=TRUE)
-legend("topright", legend="Distribuição Normal", col="darkgreen", lwd=2)
+hist(dados_d, breaks=10, freq=FALSE, col="lightyellow", main="Ajuste da Distribuição Weibull", xlab="Valores")
+
+curve(dweibull(x, shape=ajuste_weibull_d$estimate["shape"], scale=ajuste_weibull_d$estimate["scale"]),
+
+      col="blue", lwd=2, add=TRUE)
+
+legend("topright", legend="Distribuição Weibull", col="blue", lwd=2)
 ```
 
 ### e) Conjunto de dados (e)
@@ -673,23 +756,31 @@ aic_values_e
 
 **Interpretação:**
 
-A distribuição Normal apresenta o menor AIC, indicando o melhor ajuste.
+A distribuição Lognormal apresenta o menor AIC (16.74810), indicando o
+melhor ajuste aos dados.
 
-#### Teste de Kolmogorov-Smirnov
+#### Teste de Kolmogorov-Smirnov para a Distribuição Lognormal
 
 ```{r}
-ks.test(dados_e, "pnorm", mean=ajuste_normal_e$estimate["mean"], sd=ajuste_normal_e$estimate["sd"])
+ks.test(dados_e, "plnorm", meanlog=ajuste_lognormal_e$estimate["meanlog"], sdlog=ajuste_lognormal_e$estimate["sdlog"])
 ```
 
 **Interpretação:**
 
-O p-valor é maior que 0,05, não rejeitando a hipótese de aderência à distribuição Normal.
+• O p-valor é maior que 0,05, não rejeitando a hipótese de que os dados
+seguem uma distribuição Lognormal.
+
+• Portanto, para o conjunto de dados (e), a distribuição Lognormal é a
+que melhor se ajusta.
 
 #### Plotagem do Histograma com a Curva Ajustada
 
 ```{r}
-hist(dados_e, breaks=10, freq=FALSE, col="lightgray", main="Ajuste da Distribuição Normal", xlab="Valores")
-curve(dnorm(x, mean=ajuste_normal_e$estimate["mean"], sd=ajuste_normal_e$estimate["sd"]), 
-      col="orange", lwd=2, add=TRUE)
-legend("topright", legend="Distribuição Normal", col="orange", lwd=2)
+hist(dados_e, breaks=10, freq=FALSE, col="lightgray", main="Ajuste da Distribuição Lognormal", xlab="Valores")
+
+curve(dlnorm(x, meanlog=ajuste_lognormal_e$estimate["meanlog"], sdlog=ajuste_lognormal_e$estimate["sdlog"]),
+
+      col="purple", lwd=2, add=TRUE)
+
+legend("topright", legend="Distribuição Lognormal", col="purple", lwd=2)
 ```
