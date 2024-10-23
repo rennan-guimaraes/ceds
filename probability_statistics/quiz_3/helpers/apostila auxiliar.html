@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.555">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>apostila-auxiliar</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="apostila auxiliar_files/libs/clipboard/clipboard.min.js"></script>
+<script src="apostila auxiliar_files/libs/quarto-html/quarto.js"></script>
+<script src="apostila auxiliar_files/libs/quarto-html/popper.min.js"></script>
+<script src="apostila auxiliar_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="apostila auxiliar_files/libs/quarto-html/anchor.min.js"></script>
+<link href="apostila auxiliar_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="apostila auxiliar_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="apostila auxiliar_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="apostila auxiliar_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="apostila auxiliar_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+
+
+
+<hr>
+<p>title: “Introdução à Probabilidade e Estatística com R” author: “Professor” date: “2024-10-21” format: html: code-fold: true —</p>
+<section id="introdução" class="level1">
+<h1>Introdução</h1>
+<p>Olá! Neste material, iremos explorar conceitos fundamentais de Probabilidade e Estatística, com foco em distribuições de probabilidade, testes de normalidade, identificação de distribuições e ajustes de modelos estatísticos utilizando a linguagem R. O objetivo é fornecer uma compreensão detalhada dos tópicos abordados nos exercícios anteriores, de forma clara e prática.</p>
+<p>Utilizaremos exemplos práticos e bibliotecas do R para ilustrar cada conceito, facilitando assim o seu entendimento.</p>
+</section>
+<section id="tópico-1-distribuição-normal" class="level1">
+<h1>Tópico 1: Distribuição Normal</h1>
+<p>A distribuição normal, também conhecida como distribuição de Gauss, é uma das distribuições de probabilidade mais importantes na estatística. Muitas variáveis aleatórias observadas na natureza, economia e outras áreas tendem a seguir uma distribuição normal.</p>
+<section id="características-da-distribuição-normal" class="level2">
+<h2 class="anchored" data-anchor-id="características-da-distribuição-normal">Características da Distribuição Normal</h2>
+<ul>
+<li><strong>Simetria</strong>: A distribuição normal é simétrica em torno da média.</li>
+<li><strong>Média, Mediana e Moda</strong>: Na distribuição normal, esses três valores são iguais.</li>
+<li><strong>Curva em formato de sino</strong>: A representação gráfica da distribuição normal é uma curva em formato de sino.</li>
+</ul>
+</section>
+<section id="função-densidade-de-probabilidade-pdf" class="level2">
+<h2 class="anchored" data-anchor-id="função-densidade-de-probabilidade-pdf">Função Densidade de Probabilidade (PDF)</h2>
+<p>A função densidade de probabilidade da distribuição normal é dada por:</p>
+<p><span class="math display">\[
+f(x) = \frac{1}{\sigma \sqrt{2\pi}} e^{ -\frac{1}{2} \left( \frac{x - \mu}{\sigma} \right)^2 }
+\]</span></p>
+<p>Onde:</p>
+<ul>
+<li><span class="math inline">\(\mu\)</span> é a média.</li>
+<li><span class="math inline">\(\sigma\)</span> é o desvio padrão.</li>
+</ul>
+</section>
+<section id="exemplos-práticos" class="level2">
+<h2 class="anchored" data-anchor-id="exemplos-práticos">Exemplos Práticos</h2>
+<p>Vamos explorar a distribuição normal utilizando dados simulados e reais.</p>
+<section id="exemplo-1-simulação-de-dados-normais" class="level3">
+<h3 class="anchored" data-anchor-id="exemplo-1-simulação-de-dados-normais">Exemplo 1: Simulação de Dados Normais</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Simulando 1000 observações de uma distribuição normal com média 0 e desvio padrão 1</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>dados_normais <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="dv">1000</span>, <span class="at">mean =</span> <span class="dv">0</span>, <span class="at">sd =</span> <span class="dv">1</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualizando os dados</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(dados_normais, <span class="at">breaks =</span> <span class="dv">30</span>, <span class="at">probability =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Histograma de Dados Normais Simulados"</span>, <span class="at">xlab =</span> <span class="st">"Valores"</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Adicionando a curva teórica da distribuição normal</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">curve</span>(<span class="fu">dnorm</span>(x, <span class="at">mean =</span> <span class="dv">0</span>, <span class="at">sd =</span> <span class="dv">1</span>), <span class="at">col =</span> <span class="st">"red"</span>, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">add =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="apostila-auxiliar_files/figure-html/unnamed-chunk-1-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="exemplo-2-testes-de-normalidade" class="level3">
+<h3 class="anchored" data-anchor-id="exemplo-2-testes-de-normalidade">Exemplo 2: Testes de Normalidade</h3>
+<p>Para verificar se um conjunto de dados segue uma distribuição normal, podemos utilizar testes estatísticos como:</p>
+<ul>
+<li>Teste de Shapiro-Wilk</li>
+<li>Teste de Kolmogorov-Smirnov</li>
+<li>Teste de Anderson-Darling</li>
+<li>Teste de Lilliefors</li>
+</ul>
+<section id="utilizando-dados-reais" class="level4">
+<h4 class="anchored" data-anchor-id="utilizando-dados-reais">Utilizando Dados Reais</h4>
+<p>Considere o conjunto de dados referente ao tempo de transmissão via satélite:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>dados_tempo <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">149.3355</span>, <span class="fl">140.3779</span>, <span class="fl">145.7254</span>, <span class="fl">149.8931</span>, <span class="fl">139.6168</span>, <span class="fl">149.1934</span>, <span class="fl">129.6147</span>, <span class="fl">134.7523</span>, </span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>                 <span class="fl">167.8030</span>, <span class="fl">171.7407</span>, <span class="fl">157.5422</span>, <span class="fl">160.2664</span>, <span class="fl">155.4553</span>, <span class="fl">142.5989</span>, <span class="fl">134.9844</span>, <span class="fl">148.5172</span>, </span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>                 <span class="fl">163.1447</span>, <span class="fl">131.0138</span>, <span class="fl">130.2423</span>, <span class="fl">167.2239</span>, <span class="fl">149.4015</span>, <span class="fl">145.6802</span>, <span class="fl">160.3472</span>, <span class="fl">121.1775</span>, </span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>                 <span class="fl">136.7295</span>, <span class="fl">162.2381</span>, <span class="fl">150.7192</span>, <span class="fl">117.8144</span>, <span class="fl">137.3630</span>, <span class="fl">158.6373</span>, <span class="fl">168.0833</span>, <span class="fl">133.9263</span>, </span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>                 <span class="fl">150.9102</span>, <span class="fl">149.4811</span>, <span class="fl">167.4367</span>, <span class="fl">178.0970</span>, <span class="fl">138.4903</span>, <span class="fl">148.6764</span>, <span class="fl">181.0990</span>, <span class="fl">167.3345</span>, </span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>                 <span class="fl">147.0679</span>, <span class="fl">156.1410</span>, <span class="fl">148.8734</span>, <span class="fl">140.9484</span>, <span class="fl">147.6408</span>, <span class="fl">134.5726</span>, <span class="fl">184.6812</span>, <span class="fl">134.6648</span>, </span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>                 <span class="fl">146.8130</span>, <span class="fl">167.4161</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="teste-de-shapiro-wilk" class="level4">
+<h4 class="anchored" data-anchor-id="teste-de-shapiro-wilk">Teste de Shapiro-Wilk</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">shapiro.test</span>(dados_tempo)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Shapiro-Wilk normality test
+
+data:  dados_tempo
+W = 0.98185, p-value = 0.6324</code></pre>
+</div>
+</div>
+<p><strong>Interpretação</strong>: Se o p-valor for maior que 0,05, não rejeitamos a hipótese nula de que os dados seguem uma distribuição normal.</p>
+</section>
+<section id="teste-de-kolmogorov-smirnov" class="level4">
+<h4 class="anchored" data-anchor-id="teste-de-kolmogorov-smirnov">Teste de Kolmogorov-Smirnov</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ks.test</span>(dados_tempo, <span class="st">"pnorm"</span>, <span class="at">mean =</span> <span class="fu">mean</span>(dados_tempo), <span class="at">sd =</span> <span class="fu">sd</span>(dados_tempo))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Exact one-sample Kolmogorov-Smirnov test
+
+data:  dados_tempo
+D = 0.1167, p-value = 0.4688
+alternative hypothesis: two-sided</code></pre>
+</div>
+</div>
+<p><strong>Interpretação</strong>: Similar ao anterior, um p-valor maior que 0,05 indica aderência à normalidade.</p>
+</section>
+<section id="teste-de-anderson-darling" class="level4">
+<h4 class="anchored" data-anchor-id="teste-de-anderson-darling">Teste de Anderson-Darling</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(nortest)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ad.test</span>(dados_tempo)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Anderson-Darling normality test
+
+data:  dados_tempo
+A = 0.37902, p-value = 0.3928</code></pre>
+</div>
+</div>
+</section>
+<section id="teste-de-lilliefors" class="level4">
+<h4 class="anchored" data-anchor-id="teste-de-lilliefors">Teste de Lilliefors</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(nortest)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">lillie.test</span>(dados_tempo)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Lilliefors (Kolmogorov-Smirnov) normality test
+
+data:  dados_tempo
+D = 0.1167, p-value = 0.08619</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="cálculo-de-probabilidades-na-distribuição-normal" class="level3">
+<h3 class="anchored" data-anchor-id="cálculo-de-probabilidades-na-distribuição-normal">Cálculo de Probabilidades na Distribuição Normal</h3>
+<p>Podemos calcular probabilidades associadas a intervalos utilizando a função de distribuição acumulada (CDF).</p>
+<section id="exemplo-probabilidade-entre-125-e-150-segundos" class="level4">
+<h4 class="anchored" data-anchor-id="exemplo-probabilidade-entre-125-e-150-segundos">Exemplo: Probabilidade entre 125 e 150 segundos</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>media_tempo <span class="ot">&lt;-</span> <span class="fu">mean</span>(dados_tempo)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>desvio_tempo <span class="ot">&lt;-</span> <span class="fu">sd</span>(dados_tempo)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>probabilidade <span class="ot">&lt;-</span> <span class="fu">pnorm</span>(<span class="dv">150</span>, <span class="at">mean =</span> media_tempo, <span class="at">sd =</span> desvio_tempo) <span class="sc">-</span> <span class="fu">pnorm</span>(<span class="dv">125</span>, <span class="at">mean =</span> media_tempo, <span class="at">sd =</span> desvio_tempo)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>probabilidade</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.4509603</code></pre>
+</div>
+</div>
+<p><strong>Interpretando o Resultado</strong>: A probabilidade de uma chamada demorar entre 125 e 150 segundos é de aproximadamente 45.1%.</p>
+</section>
+<section id="visualização-gráfica" class="level4">
+<h4 class="anchored" data-anchor-id="visualização-gráfica">Visualização Gráfica</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Criando a sequência de valores</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>x_vals <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="fu">min</span>(dados_tempo), <span class="fu">max</span>(dados_tempo), <span class="at">length.out =</span> <span class="dv">1000</span>)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>y_vals <span class="ot">&lt;-</span> <span class="fu">dnorm</span>(x_vals, <span class="at">mean =</span> media_tempo, <span class="at">sd =</span> desvio_tempo)</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Plotando a curva de densidade</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(x_vals, y_vals, <span class="at">type =</span> <span class="st">"l"</span>, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">"blue"</span>, </span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Distribuição Normal do Tempo de Transmissão"</span>, <span class="at">xlab =</span> <span class="st">"Tempo (segundos)"</span>, <span class="at">ylab =</span> <span class="st">"Densidade"</span>)</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Destacando a área entre 125 e 150</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="fu">polygon</span>(<span class="fu">c</span>(<span class="dv">125</span>, <span class="fu">seq</span>(<span class="dv">125</span>, <span class="dv">150</span>, <span class="at">length.out =</span> <span class="dv">100</span>), <span class="dv">150</span>), </span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>        <span class="fu">c</span>(<span class="dv">0</span>, <span class="fu">dnorm</span>(<span class="fu">seq</span>(<span class="dv">125</span>, <span class="dv">150</span>, <span class="at">length.out =</span> <span class="dv">100</span>), <span class="at">mean =</span> media_tempo, <span class="at">sd =</span> desvio_tempo), <span class="dv">0</span>), </span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>        <span class="at">col =</span> <span class="st">"lightblue"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="apostila-auxiliar_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="resumo" class="level2">
+<h2 class="anchored" data-anchor-id="resumo">Resumo</h2>
+<p>A distribuição normal é fundamental na estatística, e entender como verificar a normalidade dos dados e calcular probabilidades é essencial para análises estatísticas.</p>
+</section>
+</section>
+<section id="tópico-2-identificação-de-distribuições" class="level1">
+<h1>Tópico 2: Identificação de Distribuições</h1>
+<p>Nem todos os dados seguem uma distribuição normal. É importante ser capaz de identificar qual distribuição melhor se ajusta aos dados.</p>
+<section id="principais-distribuições-contínuas" class="level2">
+<h2 class="anchored" data-anchor-id="principais-distribuições-contínuas">Principais Distribuições Contínuas</h2>
+<ul>
+<li><strong>Distribuição Weibull</strong></li>
+<li><strong>Distribuição Gama</strong></li>
+<li><strong>Distribuição Lognormal</strong></li>
+<li><strong>Distribuição Normal</strong></li>
+</ul>
+</section>
+<section id="ajuste-de-distribuições-com-o-r" class="level2">
+<h2 class="anchored" data-anchor-id="ajuste-de-distribuições-com-o-r">Ajuste de Distribuições com o R</h2>
+<p>Utilizaremos a biblioteca <code>fitdistrplus</code> para ajustar distribuições aos dados e comparar qual distribuição melhor se ajusta.</p>
+<section id="exemplo-prático" class="level3">
+<h3 class="anchored" data-anchor-id="exemplo-prático">Exemplo Prático</h3>
+<p>Considere o seguinte conjunto de dados:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>dados_exemplo <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">1.9993382</span>, <span class="fl">1.4414849</span>, <span class="fl">2.1477166</span>, <span class="fl">2.1087828</span>, <span class="fl">2.1342892</span>, <span class="fl">2.1844835</span>, <span class="fl">1.5091879</span>, <span class="fl">2.0467623</span>, </span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>                   <span class="fl">1.0642741</span>, <span class="fl">2.1302612</span>, <span class="fl">1.8389897</span>, <span class="fl">1.8924614</span>, <span class="fl">1.9316041</span>, <span class="fl">1.5602204</span>, <span class="fl">1.6991884</span>, <span class="fl">1.7228081</span>, </span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>                   <span class="fl">1.5197833</span>, <span class="fl">1.7659242</span>, <span class="fl">0.6914335</span>, <span class="fl">1.4598759</span>, <span class="fl">2.0017607</span>, <span class="fl">1.5139209</span>, <span class="fl">1.8334780</span>, <span class="fl">1.8847480</span>, </span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>                   <span class="fl">1.9072389</span>, <span class="fl">1.6294414</span>, <span class="fl">1.9068617</span>, <span class="fl">1.7744973</span>, <span class="fl">2.4300455</span>, <span class="fl">1.8958270</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="análise-descritiva" class="level3">
+<h3 class="anchored" data-anchor-id="análise-descritiva">Análise Descritiva</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(dados_exemplo)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+ 0.6914  1.5775  1.8619  1.7876  2.0012  2.4300 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(dados_exemplo, <span class="at">breaks =</span> <span class="dv">10</span>, <span class="at">probability =</span> <span class="cn">TRUE</span>, <span class="at">main =</span> <span class="st">"Histograma dos Dados de Exemplo"</span>, <span class="at">xlab =</span> <span class="st">"Valores"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="apostila-auxiliar_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="ajuste-das-distribuições" class="level3">
+<h3 class="anchored" data-anchor-id="ajuste-das-distribuições">Ajuste das Distribuições</h3>
+<section id="carregando-a-biblioteca" class="level4">
+<h4 class="anchored" data-anchor-id="carregando-a-biblioteca">Carregando a Biblioteca</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(fitdistrplus)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: MASS</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: survival</code></pre>
+</div>
+</div>
+</section>
+<section id="ajustando-distribuições" class="level4">
+<h4 class="anchored" data-anchor-id="ajustando-distribuições">Ajustando Distribuições</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>ajuste_weibull <span class="ot">&lt;-</span> <span class="fu">fitdist</span>(dados_exemplo, <span class="st">"weibull"</span>)</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>ajuste_gamma <span class="ot">&lt;-</span> <span class="fu">fitdist</span>(dados_exemplo, <span class="st">"gamma"</span>)</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>ajuste_lognormal <span class="ot">&lt;-</span> <span class="fu">fitdist</span>(dados_exemplo, <span class="st">"lnorm"</span>)</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>ajuste_normal <span class="ot">&lt;-</span> <span class="fu">fitdist</span>(dados_exemplo, <span class="st">"norm"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="comparação-dos-ajustes" class="level3">
+<h3 class="anchored" data-anchor-id="comparação-dos-ajustes">Comparação dos Ajustes</h3>
+<section id="critério-de-informação-de-akaike-aic" class="level4">
+<h4 class="anchored" data-anchor-id="critério-de-informação-de-akaike-aic">Critério de Informação de Akaike (AIC)</h4>
+<p>O AIC é utilizado para comparar modelos; quanto menor o AIC, melhor o ajuste.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>aic_values <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  Distribuição <span class="ot">=</span> <span class="fu">c</span>(<span class="st">"Weibull"</span>, <span class="st">"Gamma"</span>, <span class="st">"Lognormal"</span>, <span class="st">"Normal"</span>),</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">AIC =</span> <span class="fu">c</span>(ajuste_weibull<span class="sc">$</span>aic, ajuste_gamma<span class="sc">$</span>aic, ajuste_lognormal<span class="sc">$</span>aic, ajuste_normal<span class="sc">$</span>aic)</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>aic_values</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  Distribuição      AIC
+1      Weibull 21.97718
+2        Gamma 31.70738
+3    Lognormal 36.10330
+4       Normal 25.11073</code></pre>
+</div>
+</div>
+<p><strong>Interpretação</strong>: A distribuição com o menor AIC é a que melhor se ajusta aos dados.</p>
+</section>
+<section id="teste-de-kolmogorov-smirnov-1" class="level4">
+<h4 class="anchored" data-anchor-id="teste-de-kolmogorov-smirnov-1">Teste de Kolmogorov-Smirnov</h4>
+<p>Para a distribuição com menor AIC, realizamos o teste de Kolmogorov-Smirnov.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ks.test</span>(dados_exemplo, <span class="st">"pweibull"</span>, <span class="at">shape =</span> ajuste_weibull<span class="sc">$</span>estimate[<span class="st">"shape"</span>], <span class="at">scale =</span> ajuste_weibull<span class="sc">$</span>estimate[<span class="st">"scale"</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Exact one-sample Kolmogorov-Smirnov test
+
+data:  dados_exemplo
+D = 0.091733, p-value = 0.9424
+alternative hypothesis: two-sided</code></pre>
+</div>
+</div>
+<p><strong>Interpretação</strong>: Se o p-valor for maior que 0,05, não rejeitamos a hipótese de que os dados seguem essa distribuição.</p>
+</section>
+</section>
+<section id="visualização-do-ajuste" class="level3">
+<h3 class="anchored" data-anchor-id="visualização-do-ajuste">Visualização do Ajuste</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(dados_exemplo, <span class="at">breaks =</span> <span class="dv">10</span>, <span class="at">probability =</span> <span class="cn">TRUE</span>, <span class="at">main =</span> <span class="st">"Ajuste da Distribuição Weibull"</span>, <span class="at">xlab =</span> <span class="st">"Valores"</span>)</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="fu">curve</span>(<span class="fu">dweibull</span>(x, <span class="at">shape =</span> ajuste_weibull<span class="sc">$</span>estimate[<span class="st">"shape"</span>], <span class="at">scale =</span> ajuste_weibull<span class="sc">$</span>estimate[<span class="st">"scale"</span>]), </span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>      <span class="at">col =</span> <span class="st">"red"</span>, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">add =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="apostila-auxiliar_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="resumo-1" class="level2">
+<h2 class="anchored" data-anchor-id="resumo-1">Resumo</h2>
+<p>Identificar a distribuição adequada é crucial para modelagem estatística. O uso de critérios como o AIC e testes de aderência ajuda nessa identificação.</p>
+</section>
+</section>
+<section id="tópico-3-testes-de-normalidade-e-intervalos-de-confiança" class="level1">
+<h1>Tópico 3: Testes de Normalidade e Intervalos de Confiança</h1>
+<section id="testes-de-normalidade" class="level2">
+<h2 class="anchored" data-anchor-id="testes-de-normalidade">Testes de Normalidade</h2>
+<p>Além dos testes mencionados anteriormente, é importante compreender quando e como aplicá-los, bem como suas limitações.</p>
+<section id="exemplo-com-dados-de-inflação" class="level3">
+<h3 class="anchored" data-anchor-id="exemplo-com-dados-de-inflação">Exemplo com Dados de Inflação</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>inflacao <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">5.91</span>, <span class="fl">6.41</span>, <span class="fl">10.67</span>, <span class="fl">6.29</span>, <span class="fl">2.95</span>, <span class="fl">3.75</span>, <span class="fl">4.31</span>, <span class="fl">4.52</span>, <span class="fl">10.06</span>, <span class="fl">5.79</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="teste-de-shapiro-wilk-1" class="level4">
+<h4 class="anchored" data-anchor-id="teste-de-shapiro-wilk-1">Teste de Shapiro-Wilk</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">shapiro.test</span>(inflacao)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Shapiro-Wilk normality test
+
+data:  inflacao
+W = 0.88867, p-value = 0.1638</code></pre>
+</div>
+</div>
+</section>
+<section id="teste-de-lilliefors-1" class="level4">
+<h4 class="anchored" data-anchor-id="teste-de-lilliefors-1">Teste de Lilliefors</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">lillie.test</span>(inflacao)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Lilliefors (Kolmogorov-Smirnov) normality test
+
+data:  inflacao
+D = 0.24609, p-value = 0.08736</code></pre>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="intervalos-de-confiança" class="level2">
+<h2 class="anchored" data-anchor-id="intervalos-de-confiança">Intervalos de Confiança</h2>
+<p>Um intervalo de confiança fornece uma faixa de valores dentro da qual esperamos que um parâmetro populacional (como a média) esteja, com um certo nível de confiança.</p>
+<section id="construção-de-um-intervalo-de-confiança-para-a-média" class="level3">
+<h3 class="anchored" data-anchor-id="construção-de-um-intervalo-de-confiança-para-a-média">Construção de um Intervalo de Confiança para a Média</h3>
+<section id="exemplo-intervalo-de-confiança-de-99-para-a-média-da-inflação" class="level4">
+<h4 class="anchored" data-anchor-id="exemplo-intervalo-de-confiança-de-99-para-a-média-da-inflação">Exemplo: Intervalo de Confiança de 99% para a Média da Inflação</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>media_inflacao <span class="ot">&lt;-</span> <span class="fu">mean</span>(inflacao)</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>desvio_inflacao <span class="ot">&lt;-</span> <span class="fu">sd</span>(inflacao)</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="fu">length</span>(inflacao)</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>erro_padrao <span class="ot">&lt;-</span> desvio_inflacao <span class="sc">/</span> <span class="fu">sqrt</span>(n)</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>t_critico <span class="ot">&lt;-</span> <span class="fu">qt</span>(<span class="fl">0.995</span>, <span class="at">df =</span> n <span class="sc">-</span> <span class="dv">1</span>)</span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>limite_inferior <span class="ot">&lt;-</span> media_inflacao <span class="sc">-</span> t_critico <span class="sc">*</span> erro_padrao</span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>limite_superior <span class="ot">&lt;-</span> media_inflacao <span class="sc">+</span> t_critico <span class="sc">*</span> erro_padrao</span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Intervalo de Confiança de 99%: ["</span>, limite_inferior, <span class="st">";"</span>, limite_superior, <span class="st">"]</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Intervalo de Confiança de 99%: [ 3.457911 ; 8.674089 ]</code></pre>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="resumo-2" class="level2">
+<h2 class="anchored" data-anchor-id="resumo-2">Resumo</h2>
+<p>Os testes de normalidade e intervalos de confiança são ferramentas essenciais para inferência estatística, permitindo validar suposições e estimar parâmetros populacionais.</p>
+</section>
+</section>
+<section id="tópico-4-prática-com-dados-reais" class="level1">
+<h1>Tópico 4: Prática com Dados Reais</h1>
+<p>Vamos aplicar o que aprendemos utilizando conjuntos de dados reais.</p>
+<section id="conjunto-de-dados-a" class="level2">
+<h2 class="anchored" data-anchor-id="conjunto-de-dados-a">Conjunto de Dados (a)</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>dados_a <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">20.8625807</span>, <span class="fl">7.2445709</span>, <span class="fl">4.4659396</span>, <span class="fl">3.2712081</span>, <span class="fl">4.9300651</span>, <span class="fl">5.7444213</span>, <span class="fl">6.6700987</span>,</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>              <span class="fl">11.1750446</span>, <span class="fl">2.3753017</span>, <span class="fl">3.5425386</span>, <span class="fl">0.5978486</span>, <span class="fl">6.8869953</span>, <span class="fl">6.1102197</span>, <span class="fl">8.2716973</span>,</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>              <span class="fl">9.7465462</span>, <span class="fl">3.3991988</span>, <span class="fl">1.8557047</span>, <span class="fl">11.3983705</span>, <span class="fl">3.6847590</span>, <span class="fl">2.3327479</span>, <span class="fl">6.1364329</span>,</span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>              <span class="fl">4.4686122</span>, <span class="fl">7.8007834</span>, <span class="fl">4.7649257</span>, <span class="fl">3.8829371</span>, <span class="fl">5.9986131</span>, <span class="fl">5.5163819</span>, <span class="fl">9.6951710</span>,</span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>              <span class="fl">10.1645820</span>, <span class="fl">6.1304865</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="identificação-da-distribuição" class="level3">
+<h3 class="anchored" data-anchor-id="identificação-da-distribuição">Identificação da Distribuição</h3>
+<section id="ajuste-e-comparação" class="level4">
+<h4 class="anchored" data-anchor-id="ajuste-e-comparação">Ajuste e Comparação</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>ajuste_weibull_a <span class="ot">&lt;-</span> <span class="fu">fitdist</span>(dados_a, <span class="st">"weibull"</span>)</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>ajuste_gamma_a <span class="ot">&lt;-</span> <span class="fu">fitdist</span>(dados_a, <span class="st">"gamma"</span>)</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>ajuste_lognormal_a <span class="ot">&lt;-</span> <span class="fu">fitdist</span>(dados_a, <span class="st">"lnorm"</span>)</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>ajuste_normal_a <span class="ot">&lt;-</span> <span class="fu">fitdist</span>(dados_a, <span class="st">"norm"</span>)</span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>aic_values_a <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>  Distribuição <span class="ot">=</span> <span class="fu">c</span>(<span class="st">"Weibull"</span>, <span class="st">"Gamma"</span>, <span class="st">"Lognormal"</span>, <span class="st">"Normal"</span>),</span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">AIC =</span> <span class="fu">c</span>(ajuste_weibull_a<span class="sc">$</span>aic, ajuste_gamma_a<span class="sc">$</span>aic, ajuste_lognormal_a<span class="sc">$</span>aic, ajuste_normal_a<span class="sc">$</span>aic)</span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a>aic_values_a</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  Distribuição      AIC
+1      Weibull 161.6723
+2        Gamma 160.3733
+3    Lognormal 163.2588
+4       Normal 169.7731</code></pre>
+</div>
+</div>
+</section>
+<section id="conclusão" class="level4">
+<h4 class="anchored" data-anchor-id="conclusão">Conclusão</h4>
+<p>A distribuição Gama apresenta o menor AIC, indicando o melhor ajuste.</p>
+</section>
+</section>
+<section id="teste-de-kolmogorov-smirnov-para-a-distribuição-gama" class="level3">
+<h3 class="anchored" data-anchor-id="teste-de-kolmogorov-smirnov-para-a-distribuição-gama">Teste de Kolmogorov-Smirnov para a Distribuição Gama</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ks.test</span>(dados_a, <span class="st">"pgamma"</span>, <span class="at">shape =</span> ajuste_gamma_a<span class="sc">$</span>estimate[<span class="st">"shape"</span>], <span class="at">rate =</span> ajuste_gamma_a<span class="sc">$</span>estimate[<span class="st">"rate"</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Exact one-sample Kolmogorov-Smirnov test
+
+data:  dados_a
+D = 0.079856, p-value = 0.9828
+alternative hypothesis: two-sided</code></pre>
+</div>
+</div>
+<p><strong>Interpretação</strong>: Com um p-valor maior que 0,05, não rejeitamos a hipótese de aderência à distribuição Gama.</p>
+</section>
+<section id="visualização" class="level3">
+<h3 class="anchored" data-anchor-id="visualização">Visualização</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(dados_a, <span class="at">breaks =</span> <span class="dv">10</span>, <span class="at">probability =</span> <span class="cn">TRUE</span>, <span class="at">main =</span> <span class="st">"Ajuste da Distribuição Gama"</span>, <span class="at">xlab =</span> <span class="st">"Valores"</span>)</span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a><span class="fu">curve</span>(<span class="fu">dgamma</span>(x, <span class="at">shape =</span> ajuste_gamma_a<span class="sc">$</span>estimate[<span class="st">"shape"</span>], <span class="at">rate =</span> ajuste_gamma_a<span class="sc">$</span>estimate[<span class="st">"rate"</span>]), </span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>      <span class="at">col =</span> <span class="st">"red"</span>, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">add =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="apostila-auxiliar_files/figure-html/unnamed-chunk-23-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="aplicação-em-outros-conjuntos-de-dados" class="level2">
+<h2 class="anchored" data-anchor-id="aplicação-em-outros-conjuntos-de-dados">Aplicação em Outros Conjuntos de Dados</h2>
+<p>O mesmo processo pode ser repetido para os demais conjuntos de dados (b), (c), (d) e (e), identificando a distribuição que melhor se ajusta e realizando os testes de aderência.</p>
+</section>
+</section>
+<section id="conclusão-1" class="level1">
+<h1>Conclusão</h1>
+<p>Neste material, exploramos conceitos fundamentais de Probabilidade e Estatística, com foco em:</p>
+<ul>
+<li><strong>Distribuição Normal</strong>: Características, testes de normalidade e cálculo de probabilidades.</li>
+<li><strong>Identificação de Distribuições</strong>: Ajuste de modelos, comparação via AIC e testes de aderência.</li>
+<li><strong>Intervalos de Confiança</strong>: Construção e interpretação para médias populacionais.</li>
+<li><strong>Aplicação Prática</strong>: Utilização de bibliotecas do R para análise de dados reais.</li>
+</ul>
+<p>Esperamos que este guia tenha proporcionado uma compreensão mais profunda dos tópicos abordados e que os exemplos práticos tenham facilitado o entendimento. A prática constante e a exploração de diferentes conjuntos de dados são essenciais para consolidar o conhecimento em Estatística.</p>
+</section>
+<section id="referências" class="level1">
+<h1>Referências</h1>
+<ul>
+<li><strong>Livros</strong>:
+<ul>
+<li>“Introdução à Probabilidade e Estatística” - William Mendenhall, Robert J. Beaver e Barbara M. Beaver.</li>
+<li>“Estatística Aplicada e Probabilidade para Engenheiros” - Douglas C. Montgomery e George C. Runger.</li>
+</ul></li>
+<li><strong>Bibliotecas do R</strong>:
+<ul>
+<li><code>fitdistrplus</code>: Para ajuste de distribuições.</li>
+<li><code>nortest</code>: Para testes de normalidade.</li>
+<li><code>ggplot2</code>: Para visualização de dados.</li>
+</ul></li>
+<li><strong>Documentação do R</strong>: <a href="https://cran.r-project.org/">CRAN R Project</a></li>
+</ul>
+<hr>
+</section>
+<section id="dúvidas" class="level1">
+<h1>Dúvidas?</h1>
+<p>Se houver alguma dúvida ou necessidade de aprofundamento em algum tópico específico, não hesite em perguntar! Estamos aqui para ajudar no seu aprendizado.</p>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
