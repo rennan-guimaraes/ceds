@@ -11,7 +11,7 @@ format:
 
 # Introdução
 
-Caso esteja queira acessar o código fonte ou a versão em HTML, .PY ou .QMD,
+Caso esteja queira acessar o código fonte ou a versão em .PY ou .QMD,
 acesse o [repositório da atividade](https://github.com/rennan-guimaraes/ceds/tree/main/machine_learning/second_exercise) e os arquivos para 
 essa atividade serão os nomeados como "Aula2_rennanguimaraes".
 
