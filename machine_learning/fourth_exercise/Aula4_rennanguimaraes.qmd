@@ -1,0 +1,180 @@
+---
+title: "Atividade 4 - Aprendizado de Máquina"
+author: "Rennan Dalla Guimarães"
+format:
+  html:
+    toc: true
+    toc-float: true
+    theme: darkly
+    page-layout: full
+---
+
+# 1&nbsp;&nbsp;Classificação do Breast Cancer Wisconsin
+
+## 1.1&nbsp;&nbsp;Configuração
+
+```{python}
+#| echo: true
+#| warning: false
+import numpy as np
+import pandas as pd
+
+from sklearn.datasets import load_breast_cancer
+from sklearn.model_selection import StratifiedKFold, cross_val_score, GridSearchCV
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler, RobustScaler
+from sklearn.decomposition import PCA
+from sklearn.feature_selection import SelectKBest, f_classif
+
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.naive_bayes import GaussianNB
+from sklearn.tree import DecisionTreeClassifier
+
+RNG    = 42
+FOLDS  = 10
+cv     = StratifiedKFold(n_splits=FOLDS, shuffle=True, random_state=RNG)
+
+data   = load_breast_cancer()
+X, y   = data.data, data.target
+print(f"Instâncias: {X.shape[0]}, Atributos: {X.shape[1]}")
+```
+
+---
+
+## 1.2&nbsp;&nbsp;Experimento A – Dados brutos
+
+```{python}
+#| echo: true
+models = {
+    "KNN": KNeighborsClassifier(),
+    "Naive Bayes": GaussianNB(),
+    "Árvore Decisão": DecisionTreeClassifier(random_state=RNG)
+}
+
+param_grid = {
+    "KNN": {
+        "n_neighbors": [3,5,7,9],
+        "weights": ["uniform","distance"],
+        "metric": ["minkowski","euclidean","manhattan"]
+    },
+    "Naive Bayes": {  # GaussianNB não possui hiperparâmetros relevantes
+    },
+    "Árvore Decisão": {
+        "criterion": ["gini","entropy","log_loss"],
+        "max_depth": [None, 3, 5, 10],
+        "min_samples_split": [2, 4, 6]
+    }
+}
+
+results_raw = []
+
+for name, model in models.items():
+    if param_grid[name]:
+        grid = GridSearchCV(model, param_grid[name], cv=cv, n_jobs=-1)
+        grid.fit(X, y)
+        best_model = grid.best_estimator_
+        acc = grid.best_score_
+        params = grid.best_params_
+    else:
+        acc = cross_val_score(model, X, y, cv=cv, n_jobs=-1).mean()
+        params = {}
+    results_raw.append({"Modelo": name, "Acurácia média": acc, "Melhores parâmetros": params})
+
+pd.DataFrame(results_raw).sort_values("Acurácia média", ascending=False)
+```
+
+---
+
+## 1.3&nbsp;&nbsp;Experimento B – Dados pré‑processados
+
+* **Remoção de outliers** – RobustScaler  
+* **Seleção de features** – `SelectKBest` (teste F)  
+* **Redução de dimensionalidade** – PCA (95 % da variância)
+
+```{python}
+#| echo: true
+preprocess_pipe = Pipeline([
+    ("scale", RobustScaler()),
+    ("select", SelectKBest(score_func=f_classif, k=20)),
+    ("pca",   PCA(n_components=0.95, random_state=RNG))
+])
+
+results_pp = []
+
+for name, model in models.items():
+    pipe = Pipeline([
+        ("prep", preprocess_pipe),
+        ("clf",  model)
+    ])
+
+    if param_grid[name]:
+        # Adaptar nomes dos hiperparâmetros para o último estágio ('clf__')
+        tuned_grid = {f"clf__{k}": v for k, v in param_grid[name].items()}
+        grid = GridSearchCV(pipe, tuned_grid, cv=cv, n_jobs=-1)
+        grid.fit(X, y)
+        best_model = grid.best_estimator_
+        acc = grid.best_score_
+        params = grid.best_params_
+    else:
+        acc = cross_val_score(pipe, X, y, cv=cv, n_jobs=-1).mean()
+        params = {}
+    results_pp.append({"Modelo": name, "Acurácia média": acc, "Melhores parâmetros": params})
+
+pd.DataFrame(results_pp).sort_values("Acurácia média", ascending=False)
+```
+
+---
+
+# 2&nbsp;&nbsp;Algoritmos de Árvores de Decisão – Principais Diferenças
+
+## 2.1  Algoritmo de Hunt (1966)
+
+Hunt, Marin e Stone propuseram em 1966 um procedimento genérico de construção de árvores recursivas fundamentado no ciclo *dividir‑testar‑parar*. O trabalho não prescreveu critérios específicos de impureza, servindo como **arcabouço inicial** para que técnicas posteriores, mais especializadas, pudessem ser desenvolvidas.
+
+## 2.2  ID3 (Quinlan, 1986)
+
+O **ID3** introduziu o uso do **Ganho de Informação** (entropia) como métrica para selecionar o atributo de divisão. Embora tenha representado grande avanço, possui duas limitações principais: (i) sensibilidade a atributos com muitos valores distintos e (ii) ausência de um mecanismo sistemático de poda, o que pode levar a sobre‑ajuste. Ademais, atributos contínuos requerem discretização prévia.
+
+## 2.3  C4.5 (Quinlan, 1993)
+
+O sucessor natural do ID3 trouxe quatro aperfeiçoamentos:
+
+* **Gain Ratio**, que normaliza o Ganho de Informação, reduzindo o viés para atributos multi‑válidos;  
+* **Tratamento direto de variáveis contínuas**, selecionando limiares ótimos durante a divisão;  
+* **Poda com estimativa de erro de generalização**, diminuindo o risco de sobre‑ajuste;  
+* Capacidade de converter a árvore em um conjunto de **regras proposicionais**, facilitando a interpretação.
+
+## 2.4  J4.8 (Witten & Frank, 1996)
+
+Popularizado no ambiente WEKA, o **J4.8** é essencialmente uma **implementação de código aberto do C4.5 em Java**. O algoritmo subjacente mantém a mesma lógica; a denominação distinta está associada apenas a questões de licenciamento de software.
+
+## 2.5  C5.0 (Quinlan, 2000)
+
+O **C5.0** pode ser visto como uma evolução de engenharia sobre o C4.5:
+
+* Aumento expressivo de velocidade e redução de uso de memória;  
+* Procedimento de **winnowing** para eliminar atributos irrelevantes antes da indução;  
+* Suporte a **pesos de instância** e a um componente de **boosting interno**.
+
+Conceitualmente permanece alinhado ao C4.5, mas é mais eficiente em contextos de produção.
+
+## 2.6  CART (Breiman et al., 1984)
+
+O **CART** difere substancialmente da linha ID3–C5.0:
+
+* Utiliza **Índice de Gini** (classificação) ou **Soma dos Erros Quadráticos** (regressão) como critério de divisão;  
+* Gera **somente divisões binárias**, o que simplifica a análise da árvore resultante;  
+* Aplica **poda custo‑complexidade (CCP)**, removendo ramos cujo benefício estatístico não compensa o aumento de complexidade;  
+* Possui suporte nativo a **modelagem de regressão**, além da classificação.
+
+## 2.7  Random Forest (Breiman, 2001)
+
+A **Random Forest** estabelece um **conjunto (ensemble) de diversas árvores CART** combinadas por votação. Dois mecanismos geram diversidade entre as árvores: (i) *bootstrap* de amostras e (ii) sub‑amostragem aleatória de atributos em cada divisão. Essa abordagem reduz significativamente a variância do modelo, fornecendo alto desempenho com necessidade mínima de ajuste fino.
+
+## 2.8  Considerações Comparativas
+
+* A família **ID3 → C4.5 → C5.0** progride em capacidade de lidar com atributos contínuos, estratégias de poda e eficiência computacional.  
+* O **CART** introduz árvores estritamente binárias e um esquema de poda fundamentado em teoria estatística robusta, tornando‑o a base para diversos algoritmos de *ensembles*.  
+* A **Random Forest** demonstra que a agregação de modelos independentes é um caminho eficaz para aumentar a capacidade de generalização, sem sacrificar interpretabilidade em nível de atributo.
+
+---
