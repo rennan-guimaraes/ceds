@@ -14,16 +14,20 @@ Requirements (install via pip if missing):
     seaborn
     lightgbm
     xgboost
+    scipy
+    ydata-profiling
 
 Usage:
     Place `german.rds` in the same directory as this script, then run:
         python german_credit_classification.py
 
 Outputs:
+    - german_credit_eda_report.html : exploratory data analysis report
     - metrics_cv.csv : cross‑validation metric summary
     - metrics_test.csv : test‑set metric summary
     - auc_boxplot.png : variability of ROC‑AUC across folds
     - roc_curves.png : ROC curves for best models on test set
+    - pr_curves.png : Precision-Recall curves for best models on test set
     - final_classification_model.pkl : pickle of final LightGBM model
 """
 
@@ -40,6 +44,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 import pyreadr
+import ydata_profiling
+from scipy.stats import ks_2samp
 
 from sklearn.model_selection import (
     train_test_split,
@@ -57,6 +63,7 @@ from sklearn.metrics import (
     f1_score,
     roc_auc_score,
     RocCurveDisplay,
+    PrecisionRecallDisplay,
 )
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.tree import DecisionTreeClassifier
@@ -82,6 +89,7 @@ METRICS = {
     "recall": recall_score,
     "f1": f1_score,
     "roc_auc": roc_auc_score,
+    "ks": lambda y_true, y_prob: ks_2samp(y_prob[y_true == 1], y_prob[y_true == 0])[0],
 }
 
 
@@ -98,7 +106,7 @@ def evaluate_cv(model, X, y, cv):
 
         rows.append(
             {
-                m: f(y_val, y_pred if m != "roc_auc" else y_prob)
+                m: f(y_val, y_pred if m not in ["roc_auc", "ks"] else y_prob)
                 for m, f in METRICS.items()
             }
         )
@@ -124,6 +132,16 @@ for col in german.select_dtypes(exclude=["number"]).columns:
         german[col] = german[col].astype(str).str.replace(r"[\[\]<]", "_", regex=True)
 
 german["Good_loan"] = german["Good_loan"].astype("category").cat.codes
+
+# ---------------------------------------------------------------------
+# 0.5. Exploratory Data Analysis
+# ---------------------------------------------------------------------
+print("=== Gerando relatório de Análise Exploratória (EDA) ===")
+profile = ydata_profiling.ProfileReport(
+    german, title="German Credit Data Profiling", minimal=True
+)
+profile.to_file("german_credit_eda_report.html")
+print("--> Relatório salvo em german_credit_eda_report.html\n")
 
 X = german.drop(columns=["Good_loan"])
 y = german["Good_loan"]
@@ -320,7 +338,8 @@ plt.savefig("auc_boxplot.png", dpi=300)
 # ---------------------------------------------------------------------
 best_models = {name: s.best_estimator_ for name, s in searches.items()}
 test_rows = []
-plt.figure(figsize=(10, 8))
+fig_roc, ax_roc = plt.subplots(figsize=(10, 8))
+fig_pr, ax_pr = plt.subplots(figsize=(10, 8))
 
 for idx, (name, mdl) in enumerate(best_models.items(), start=1):
     model = deepcopy(mdl)
@@ -339,16 +358,25 @@ for idx, (name, mdl) in enumerate(best_models.items(), start=1):
             "recall": recall_score(y_test, y_pred),
             "f1": f1_score(y_test, y_pred),
             "roc_auc": roc_auc_score(y_test, y_prob),
+            "ks": ks_2samp(y_prob[y_test == 1], y_prob[y_test == 0])[0],
             "tuning_time_s": tuning_times[name],
             "predict_time_s": round(end_pred_time - start_pred_time, 4),
         }
     )
 
-    disp = RocCurveDisplay.from_predictions(y_test, y_prob, name=name, ax=plt.gca())
+    RocCurveDisplay.from_predictions(y_test, y_prob, name=name, ax=ax_roc)
+    PrecisionRecallDisplay.from_predictions(y_test, y_prob, name=name, ax=ax_pr)
 
-plt.title("ROC Curves — Test Set")
-plt.legend()
-plt.savefig("roc_curves.png", dpi=300)
+ax_roc.set_title("ROC Curves — Test Set")
+ax_roc.legend()
+fig_roc.savefig("roc_curves.png", dpi=300)
+
+ax_pr.set_title("Precision-Recall Curves — Test Set")
+ax_pr.legend()
+fig_pr.savefig("pr_curves.png", dpi=300)
+
+plt.close(fig_roc)
+plt.close(fig_pr)
 
 test_metrics = pd.DataFrame(test_rows).round(3)
 test_metrics.to_csv("metrics_test.csv", index=False)
@@ -360,6 +388,3 @@ print(test_metrics)
 # ---------------------------------------------------------------------
 best_name = test_metrics.loc[test_metrics["roc_auc"].idxmax(), "Model"]
 print(f"\n>>> Melhor modelo selecionado: {best_name}")
-
-final_model = best_models[best_name]
-final_model.fit(pd.concat([X_train, X_test]), pd.concat([y_train, y_test]))
